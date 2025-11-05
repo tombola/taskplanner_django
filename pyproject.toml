@@ -1,0 +1,11 @@
+[project]
+name = "taskplanner"
+version = "0.1.0"
+description = "task planning app"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "django>=5.2.8",
+    "pytest-django>=4.11.1",
+    "todoist-api-python>=3.1.0",
+]
