@@ -18,22 +18,20 @@ add tasks and subtasks (using nested streamfield blocks). Each streamfield
 todoist task.
 
 Uses tokens when creating a task group so that the titles of each task group
-instance can be differentiated. The tokens are defined in a streamfield.
+instance can be differentiated. The tokens are defined in a comma-separated CharField.
 
 Example:
 
 Wagtail page
     - title: Chilli task template
-    - tokens:
-      - SKU
-      - VARIETYNAME
+    - tokens: SKU, VARIETYNAME
     - tasks:
-      - sow SKU (label:sow)
-      - plant SKU (label:plant)
-      - harvest SKU (label:harvest)
-      - process SKU (label:process)
-          - SKU checked in
-          - SKU dried
+      - sow {SKU} (label:sow)
+      - plant {SKU} (label:plant)
+      - harvest {SKU} (label:harvest)
+      - process {SKU} (label:process)
+          - {SKU} checked in
+          - {SKU} dried
 
 ### Task Creation Form
 

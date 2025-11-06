@@ -1,0 +1,45 @@
+from django import forms
+from .models import TaskGroupTemplate
+
+
+class TaskGroupCreationForm(forms.Form):
+    """Form for creating task groups from templates"""
+
+    task_group_template = forms.ModelChoiceField(
+        queryset=TaskGroupTemplate.objects.live(),
+        required=True,
+        help_text="Select a task group template"
+    )
+
+    def __init__(self, *args, **kwargs):
+        template_id = kwargs.pop('template_id', None)
+        super().__init__(*args, **kwargs)
+
+        # If a template is selected, add dynamic token fields
+        if template_id:
+            try:
+                template = TaskGroupTemplate.objects.get(id=template_id)
+                tokens = template.get_token_list()
+
+                for token in tokens:
+                    field_name = f'token_{token}'
+                    self.fields[field_name] = forms.CharField(
+                        label=token,
+                        required=True,
+                        help_text=f"Value for {token} token"
+                    )
+            except TaskGroupTemplate.DoesNotExist:
+                pass
+
+    def get_token_values(self):
+        """Extract token values from cleaned data"""
+        if not hasattr(self, 'cleaned_data'):
+            return {}
+
+        token_values = {}
+        for key, value in self.cleaned_data.items():
+            if key.startswith('token_'):
+                token_name = key.replace('token_', '')
+                token_values[token_name] = value
+
+        return token_values
