@@ -15,10 +15,14 @@ class TaskGroupCreationForm(forms.Form):
         template_id = kwargs.pop('template_id', None)
         super().__init__(*args, **kwargs)
 
-        # If a template is selected, add dynamic token fields
+        # If a template is selected, add dynamic token fields and set initial value
         if template_id:
             try:
                 template = TaskGroupTemplate.objects.get(id=template_id)
+
+                # Set initial value for task_group_template field
+                self.fields['task_group_template'].initial = template
+
                 tokens = template.get_token_list()
 
                 for token in tokens:

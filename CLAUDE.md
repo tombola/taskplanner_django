@@ -11,6 +11,10 @@ This project uses `uv` for Python version and virtual environment management.
 # Install dependencies
 uv sync
 
+# Copy example environment file and configure
+cp .env.example .env
+# Edit .env and add your TODOIST_API_TOKEN
+
 # Run commands in the uv environment
 uv run <command>
 ```
@@ -70,6 +74,13 @@ uv run python manage.py shell
 ```bash
 # Create superuser
 uv run python manage.py createsuperuser
+```
+
+### Wagtail Admin
+```bash
+# Access Wagtail admin at http://localhost:8000/admin/
+# Configure Task Planner settings: Settings → Task Planner Settings
+#   - debug_mode: Enable to print debug info instead of posting to Todoist API
 ```
 
 ## Architecture Notes

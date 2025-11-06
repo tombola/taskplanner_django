@@ -22,12 +22,21 @@
 - `tasks`: StreamField containing TaskBlocks for the task structure
 - `get_token_list()`: Helper method to parse comma-separated tokens into a list
 
+**TaskPlannerSettings** (Wagtail Site Setting)
+- Configurable in Wagtail admin under Settings → Task Planner Settings
+- `debug_mode`: Boolean flag to enable debug mode (default: False)
+  - When enabled, task creation prints debug info to stderr instead of posting to Todoist API
+  - Useful for testing task templates without actually creating tasks in Todoist
+  - Debug output shows task hierarchy, labels, and token substitution results
+
 ### Forms (`tasks/forms.py`)
 
 **TaskGroupCreationForm**
 - `task_group_template`: ModelChoiceField to select template
 - Dynamically generates fields based on template's tokens
-- When `template_id` is provided, creates input fields named `token_{TOKEN_NAME}`
+- When `template_id` is provided:
+  - Pre-populates the `task_group_template` field with the specified template
+  - Creates input fields named `token_{TOKEN_NAME}` for each token
 - `get_token_values()`: Extracts token values from form submission
 
 ### Views (`tasks/views.py`)
@@ -35,17 +44,23 @@
 **create_task_group**
 - Renders form for task creation
 - On template selection, reloads page with `template_id` to show token fields
-- On submission, calls Todoist API to create tasks with token substitution
-- Requires `TODOIST_API_TOKEN` in settings
+- Checks `debug_mode` from TaskPlannerSettings
+- On submission:
+  - If debug mode enabled: prints task structure to stderr
+  - If debug mode disabled: calls Todoist API to create tasks with token substitution
+- Requires `TODOIST_API_TOKEN` in settings (only when debug mode is disabled)
 
 **create_tasks_from_template**
-- Iterates through template's tasks and creates them via API
+- Iterates through template's tasks and creates them via API or prints debug info
+- Accepts `debug` parameter to control behavior
+- Prints debug header/footer when in debug mode
 
 **create_task_recursive**
 - Recursively creates tasks and subtasks
 - Performs token substitution in titles: replaces `{TOKEN}` with provided values
 - Parses comma-separated labels
-- Creates parent-child relationships for subtasks using `parent_id`
+- In normal mode: creates parent-child relationships for subtasks using `parent_id`
+- In debug mode: prints indented task hierarchy with labels and mock IDs
 
 ### Templates
 
@@ -81,13 +96,20 @@
 
 **Settings** (`taskplanner/settings.py`)
 - Added Wagtail apps and dependencies to `INSTALLED_APPS`
+- Added `wagtail.contrib.settings` to `INSTALLED_APPS` for admin-configurable settings
 - Added `tasks` app to `INSTALLED_APPS`
 - Added Wagtail redirect middleware
+- Added `wagtail.contrib.settings.context_processors.settings` to template context processors
 - Configured `WAGTAIL_SITE_NAME` and `WAGTAILADMIN_BASE_URL`
 - Configured `MEDIA_ROOT` and `MEDIA_URL`
 
-**Required environment variable**:
-- `TODOIST_API_TOKEN`: API token for Todoist integration (to be added to settings)
+**Admin-configurable settings** (Wagtail Admin → Settings → Task Planner Settings):
+- `debug_mode`: Enable debug mode to print task info instead of posting to Todoist
+
+**Environment variables** (configure in `.env` file):
+- `TODOIST_API_TOKEN`: API token for Todoist integration (required when debug mode is disabled)
+  - Get your token from https://todoist.com/app/settings/integrations/developer
+  - Copy `.env.example` to `.env` and add your token
 
 ## Workflow
 
@@ -101,10 +123,12 @@
 ## Testing
 
 **Test coverage** (`tasks/tests.py`)
-- 16 tests for TaskGroupCreationForm and TaskGroupTemplate model
+- 18 tests for TaskGroupCreationForm and TaskGroupTemplate model
 - Tests dynamic field generation based on tokens
 - Tests form validation and token value extraction
+- Tests template field pre-population when template_id is provided
 - Tests model's `get_token_list()` method with various inputs
+- Tests Wagtail hooks for applying default tokens
 - Uses pytest with pytest-django plugin
 - Run tests: `uv run pytest tasks/tests.py -v`
 

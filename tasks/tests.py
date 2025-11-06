@@ -207,6 +207,20 @@ class TestTaskGroupCreationForm:
 
         assert task_group_template not in queryset2
 
+    def test_template_field_populated_with_template_id(self, task_group_template):
+        """Form should pre-populate task_group_template field when template_id provided"""
+        form = TaskGroupCreationForm(template_id=task_group_template.id)
+
+        # Should have initial value set
+        assert form.fields['task_group_template'].initial == task_group_template
+
+    def test_template_field_not_populated_without_template_id(self):
+        """Form should not pre-populate task_group_template field when no template_id"""
+        form = TaskGroupCreationForm()
+
+        # Should not have initial value
+        assert form.fields['task_group_template'].initial is None
+
 
 class TestTaskGroupTemplateModel(WagtailPageTestCase):
     """Tests for TaskGroupTemplate model"""
