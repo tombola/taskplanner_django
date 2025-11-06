@@ -49,6 +49,17 @@
 
 ### Templates
 
+**tasks/templates/tasks/task_group_template.html**
+- Display template for TaskGroupTemplate pages
+- Shows tokens, task structure with subtasks, and labels
+- Includes link to create tasks from the template
+- Extends `base.html`
+
+**tasks/templates/base.html**
+- Base template with common layout
+- Includes navigation, footer, and shared styles
+- Custom CSS for task group template display
+
 **tasks/templates/tasks/create_task_group.html**
 - Form for selecting template and entering token values
 - JavaScript event listener: when template selected, reloads page with `template_id` query param to dynamically show token input fields

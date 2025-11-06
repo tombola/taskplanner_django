@@ -41,6 +41,8 @@ class TaskGroupTemplate(Page):
         FieldPanel('tasks'),
     ]
 
+    template = 'tasks/task_group_template.html'
+
     class Meta:
         verbose_name = 'Task Group Template'
 

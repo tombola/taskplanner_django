@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Planner{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'tasks/css/styles.css' %}">
+    <style>
+        .task-group-template {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tokens-section, .tasks-section, .actions {
+            margin: 30px 0;
+        }
+
+        .tokens-section h2, .tasks-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .help-text {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .token-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .token-list li {
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+
+        .token-list code {
+            font-family: monospace;
+            background: #fff;
+            padding: 2px 5px;
+            border-radius: 2px;
+        }
+
+        .tasks-structure {
+            border-left: 3px solid #007bff;
+            padding-left: 20px;
+        }
+
+        .task-item {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .task-item h3 {
+            margin: 0 0 10px 0;
+            color: #007bff;
+        }
+
+        .labels {
+            font-size: 0.9em;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .subtasks {
+            margin: 15px 0 0 20px;
+            list-style: disc;
+        }
+
+        .subtasks li {
+            margin: 5px 0;
+        }
+
+        .subtasks .labels {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .actions {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .button:hover {
+            background: #0056b3;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/admin/">Admin</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Task Planner</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
