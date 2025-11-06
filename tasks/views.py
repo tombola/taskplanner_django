@@ -81,10 +81,10 @@ def create_task_recursive(api, task_block, token_values, parent_id=None):
 
     created_task = api.add_task(**task_params)
 
-    # Create subtasks if they exist
+    # Create subtasks if they exist (ListBlock returns a list of dicts)
     if task_block.get('subtasks'):
         for subtask_data in task_block['subtasks']:
-            if subtask_data.block_type == 'task':
-                create_task_recursive(api, subtask_data.value, token_values, parent_id=created_task.id)
+            # Subtasks are plain dicts from ListBlock
+            create_task_recursive(api, subtask_data, token_values, parent_id=created_task.id)
 
     return created_task

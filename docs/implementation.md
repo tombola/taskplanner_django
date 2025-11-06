@@ -87,9 +87,29 @@
 5. Fill in token values
 6. Submit form to create tasks via Todoist API
 
+## Testing
+
+**Test coverage** (`tasks/tests.py`)
+- 16 tests for TaskGroupCreationForm and TaskGroupTemplate model
+- Tests dynamic field generation based on tokens
+- Tests form validation and token value extraction
+- Tests model's `get_token_list()` method with various inputs
+- Uses pytest with pytest-django plugin
+- Run tests: `uv run pytest tasks/tests.py -v`
+
+**Test fixtures**
+- `wagtail_site`: Creates/retrieves Wagtail site for testing
+- `task_group_template`: Creates template with tokens and nested subtasks
+- `empty_template`: Creates template without tokens for edge case testing
+
+## Implementation Notes
+
+**Subtasks structure**: Uses `blocks.ListBlock` with inline `StructBlock` definition instead of recursive `TaskBlock` references to avoid infinite recursion during model initialization. Subtasks support one level of nesting.
+
 ## Not Implemented
 
 - Webhook endpoint for status changes (as noted in plan.md)
 - Error handling for API failures beyond basic messaging
 - Task tracking/history in database
 - Authentication/authorization
+- Deep nesting of subtasks (currently limited to one level)
