@@ -17,19 +17,25 @@
 - Uses recursive structure: subtasks are also TaskBlocks
 - Tokens in titles use `{TOKEN_NAME}` format for substitution
 
+**TaskPlannerSettings** (Wagtail Site Setting)
+- Site-wide settings configurable in Wagtail admin under Settings → Task Planner Settings
+- `tokens`: CharField containing comma-separated token names (e.g., "SKU, VARIETYNAME")
+- `parent_task_title`: Optional title template for parent task (can use tokens). If empty, uses template page title
+- `get_token_list()`: Helper method to parse comma-separated tokens into a list
+
 **TaskGroupTemplate** (Wagtail Page model)
 - Wagtail page type for creating task templates
-- `tokens`: CharField containing comma-separated token names (e.g., "SKU, VARIETYNAME")
 - `tasks`: StreamField containing TaskBlocks for the task structure
-- `get_token_list()`: Helper method to parse comma-separated tokens into a list
+- Tokens are defined in TaskPlannerSettings (site-wide), not per-page
 
 ### Forms (`tasks/forms.py`)
 
 **TaskGroupCreationForm**
 - `task_group_template`: ModelChoiceField to select template
-- Dynamically generates fields based on template's tokens
-- When `template_id` is provided:
+- Dynamically generates fields based on tokens from TaskPlannerSettings (site-wide)
+- When `template_id` and `site` are provided:
   - Pre-populates the `task_group_template` field with the specified template
+  - Reads tokens from TaskPlannerSettings for the site
   - Creates input fields named `token_{TOKEN_NAME}` for each token
 - `get_token_values()`: Extracts token values from form submission
 
@@ -45,7 +51,12 @@
 - Requires `TODOIST_API_TOKEN` environment variable (only when debug mode is disabled)
 
 **create_tasks_from_template**
-- Iterates through template's tasks and creates them via API or prints debug info
+- Creates a parent task using either:
+  - `parent_task_title` from TaskPlannerSettings (if configured), or
+  - Template page title as fallback
+- Applies token substitution to the parent task title
+- Iterates through template's tasks and creates them as subtasks of the parent task
+- Accepts `site` parameter to access settings
 - Accepts `debug` parameter to control behavior
 - Prints debug header/footer when in debug mode
 
@@ -107,28 +118,59 @@
 
 ## Workflow
 
-1. Create TaskGroupTemplate pages in Wagtail admin
-2. Define tokens (comma-separated) and task structure with nested subtasks
-3. Navigate to `/tasks/create/`
-4. Select template from dropdown (page reloads showing token input fields)
-5. Fill in token values
-6. Submit form to create tasks via Todoist API
+1. Configure site-wide settings in Wagtail admin (Settings → Task Planner Settings):
+   - Define tokens (comma-separated, e.g., "SKU, VARIETYNAME")
+   - Optionally define parent_task_title template (e.g., "Plant {VARIETYNAME}")
+2. Create TaskGroupTemplate pages in Wagtail admin
+3. Define task structure with nested subtasks (tokens from site settings can be used)
+4. Navigate to `/tasks/create/`
+5. Select template from dropdown (page reloads showing token input fields based on site settings)
+6. Fill in token values
+7. Submit form to create tasks via Todoist API:
+   - The parent task uses `parent_task_title` from settings (or template page title as fallback)
+   - All tasks defined in the template become subtasks of the parent task
+   - Subtasks defined within tasks become nested subtasks
+
+**Example hierarchy:**
+```
+Settings:
+  - Tokens: "SKU, VARIETYNAME"
+  - Parent Task Title: "Plant {VARIETYNAME}"
+
+Template: "Tomato Template"
+Tasks in template:
+  - "Sow seeds"
+    - "Prepare soil"
+    - "Plant seeds"
+  - "Water plants"
+
+With tokens: SKU="TOM001", VARIETYNAME="Tomato"
+
+Result in Todoist:
+└─ Plant Tomato                    (from parent_task_title setting)
+   ├─ Sow seeds                     (from template tasks)
+   │  ├─ Prepare soil               (nested subtask)
+   │  └─ Plant seeds                (nested subtask)
+   └─ Water plants                  (from template tasks)
+```
 
 ## Testing
 
 **Test coverage** (`tasks/tests.py`)
-- Tests for TaskGroupCreationForm and TaskGroupTemplate model
-- Tests dynamic field generation based on tokens
+- Tests for TaskGroupCreationForm and TaskPlannerSettings model
+- Tests dynamic field generation based on tokens from site settings
 - Tests form validation and token value extraction
 - Tests template field pre-population when template_id is provided
-- Tests model's `get_token_list()` method with various inputs
+- Tests TaskPlannerSettings `get_token_list()` method with various inputs
 - Uses pytest with pytest-django plugin
 - Run tests: `uv run pytest tasks/tests.py -v`
 
 **Test fixtures**
 - `wagtail_site`: Creates/retrieves Wagtail site for testing
-- `task_group_template`: Creates template with tokens and nested subtasks
-- `empty_template`: Creates template without tokens for edge case testing
+- `planner_settings`: Creates TaskPlannerSettings with tokens
+- `empty_planner_settings`: Creates TaskPlannerSettings without tokens
+- `task_group_template`: Creates template with nested subtasks
+- `empty_template`: Creates template without tokens in settings
 
 ## Implementation Notes
 

@@ -5,12 +5,12 @@
 <div class="task-group-template">
     <h1>{{ page.title }}</h1>
 
-    {% if page.tokens %}
+    {% if settings.tasks.TaskPlannerSettings.tokens %}
     <section class="tokens-section">
         <h2>Tokens</h2>
-        <p class="help-text">The following tokens can be used in task titles:</p>
+        <p class="help-text">The following tokens can be used in task titles (configured in site settings):</p>
         <ul class="token-list">
-            {% for token in page.get_token_list %}
+            {% for token in settings.tasks.TaskPlannerSettings.get_token_list %}
             <li><code>{​{ {{ token }} }​}</code></li>
             {% endfor %}
         </ul>

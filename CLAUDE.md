@@ -85,6 +85,9 @@ uv run python manage.py createsuperuser
 ### Wagtail Admin
 ```bash
 # Access Wagtail admin at http://localhost:8000/admin/
+# Configure Task Planner settings: Settings → Task Planner Settings
+#   - tokens: Comma-separated list of tokens (e.g., SKU, VARIETYNAME)
+#   - parent_task_title: Optional title template for parent task (uses template title if empty)
 ```
 
 ## Architecture Notes

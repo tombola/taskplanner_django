@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.conf import settings
 from todoist_api_python.api import TodoistAPI
-from .models import TaskGroupTemplate
+from .models import TaskGroupTemplate, TaskPlannerSettings
 from .forms import TaskGroupCreationForm
 import sys
 
@@ -12,8 +12,12 @@ def create_task_group(request):
 
     template_id = request.GET.get('template_id') or request.POST.get('template_id')
 
+    # Get the site for accessing settings
+    from wagtail.models import Site
+    site = Site.find_for_request(request)
+
     if request.method == 'POST':
-        form = TaskGroupCreationForm(request.POST, template_id=template_id)
+        form = TaskGroupCreationForm(request.POST, template_id=template_id, site=site)
 
         if form.is_valid():
             template = form.cleaned_data['task_group_template']
@@ -26,7 +30,7 @@ def create_task_group(request):
             try:
                 if debug_mode:
                     # Debug mode: print to console instead of posting
-                    created_tasks = create_tasks_from_template(None, template, token_values, debug=True)
+                    created_tasks = create_tasks_from_template(None, template, token_values, site, debug=True)
                     messages.success(request, f'DEBUG MODE: Printed {len(created_tasks)} tasks to console')
                 else:
                     # Normal mode: post to Todoist API
@@ -36,7 +40,7 @@ def create_task_group(request):
                         return redirect('tasks:create_task_group')
 
                     api = TodoistAPI(api_token)
-                    created_tasks = create_tasks_from_template(api, template, token_values, debug=False)
+                    created_tasks = create_tasks_from_template(api, template, token_values, site, debug=False)
                     messages.success(request, f'Successfully created {len(created_tasks)} tasks')
 
                 return redirect('tasks:create_task_group')
@@ -45,7 +49,7 @@ def create_task_group(request):
                 messages.error(request, f'Error creating tasks: {str(e)}')
 
     else:
-        form = TaskGroupCreationForm(template_id=template_id)
+        form = TaskGroupCreationForm(template_id=template_id, site=site)
 
     return render(request, 'tasks/create_task_group.html', {
         'form': form,
@@ -53,13 +57,14 @@ def create_task_group(request):
     })
 
 
-def create_tasks_from_template(api, template, token_values, debug=False):
+def create_tasks_from_template(api, template, token_values, site, debug=False):
     """Create Todoist tasks from template with token substitution
 
     Args:
         api: TodoistAPI instance (can be None if debug=True)
         template: TaskGroupTemplate instance
         token_values: Dict of token replacements
+        site: Wagtail Site instance for accessing settings
         debug: If True, print debug info instead of posting to API
     """
     created_tasks = []
@@ -70,10 +75,53 @@ def create_tasks_from_template(api, template, token_values, debug=False):
         print(f"DEBUG: Token values: {token_values}", file=sys.stderr)
         print("="*80 + "\n", file=sys.stderr)
 
+    # Get parent task title from settings, or use template title as fallback
+    planner_settings = TaskPlannerSettings.for_site(site)
+    if planner_settings.parent_task_title:
+        parent_title = planner_settings.parent_task_title
+    else:
+        parent_title = template.title
+
+    # Substitute tokens in parent title
+    for token, value in token_values.items():
+        parent_title = parent_title.replace(f'{{{token}}}', value)
+
+    # Create parent task from template page
+    task_params = {
+        'content': parent_title,
+    }
+
+    if debug:
+        # Debug mode: print parent task info
+        print(f"Parent Task: {parent_title}", file=sys.stderr)
+
+        # Create a mock task object with just an id
+        class MockTask:
+            def __init__(self):
+                import random
+                self.id = f"debug_{random.randint(1000, 9999)}"
+
+        parent_task = MockTask()
+    else:
+        # Normal mode: create parent task via API
+        try:
+            print(f"DEBUG: Creating parent task with params: {task_params}", file=sys.stderr)
+            parent_task = api.add_task(**task_params)
+            print(f"DEBUG: Parent task created successfully: {parent_task.id}", file=sys.stderr)
+        except Exception as e:
+            print(f"ERROR: Failed to create parent task: {str(e)}", file=sys.stderr)
+            print(f"ERROR: Task params were: {task_params}", file=sys.stderr)
+            import traceback
+            traceback.print_exc(file=sys.stderr)
+            raise
+
+    created_tasks.append(parent_task)
+
+    # Create all template tasks as subtasks of the parent
     for task_data in template.tasks:
         if task_data.block_type == 'task':
             task_block = task_data.value
-            created_task = create_task_recursive(api, task_block, token_values, debug=debug)
+            created_task = create_task_recursive(api, task_block, token_values, parent_id=parent_task.id, debug=debug, indent=1)
             if created_task:
                 created_tasks.append(created_task)
 

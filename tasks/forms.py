@@ -1,5 +1,5 @@
 from django import forms
-from .models import TaskGroupTemplate
+from .models import TaskGroupTemplate, TaskPlannerSettings
 
 
 class TaskGroupCreationForm(forms.Form):
@@ -13,6 +13,7 @@ class TaskGroupCreationForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         template_id = kwargs.pop('template_id', None)
+        site = kwargs.pop('site', None)
         super().__init__(*args, **kwargs)
 
         # If a template is selected, add dynamic token fields and set initial value
@@ -23,7 +24,12 @@ class TaskGroupCreationForm(forms.Form):
                 # Set initial value for task_group_template field
                 self.fields['task_group_template'].initial = template
 
-                tokens = template.get_token_list()
+                # Get tokens from site settings
+                if site:
+                    planner_settings = TaskPlannerSettings.for_site(site)
+                    tokens = planner_settings.get_token_list()
+                else:
+                    tokens = []
 
                 for token in tokens:
                     field_name = f'token_{token}'
