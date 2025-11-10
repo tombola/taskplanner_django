@@ -5,7 +5,8 @@
 - **Django project**: `taskplanner` (project configuration)
 - **Django app**: `tasks` (task management functionality)
 - **Dependencies**: Django 5.2.8, Wagtail 7.2, pytest-django 4.11.1, todoist-api-python 3.1.0
-- **Python version**: 3.14.0 (managed via uv)
+- **Python version**: 3.13.x (managed via uv)
+  - **Note**: Python 3.14 is not supported due to incompatibility with dataclass-wizard (used by todoist-api-python). The `doc` parameter was added to `dataclasses.field()` in Python 3.14, breaking dataclass-wizard 0.35.1.
 
 ## Core Components
 
@@ -22,13 +23,6 @@
 - `tasks`: StreamField containing TaskBlocks for the task structure
 - `get_token_list()`: Helper method to parse comma-separated tokens into a list
 
-**TaskPlannerSettings** (Wagtail Site Setting)
-- Configurable in Wagtail admin under Settings → Task Planner Settings
-- `debug_mode`: Boolean flag to enable debug mode (default: False)
-  - When enabled, task creation prints debug info to stderr instead of posting to Todoist API
-  - Useful for testing task templates without actually creating tasks in Todoist
-  - Debug output shows task hierarchy, labels, and token substitution results
-
 ### Forms (`tasks/forms.py`)
 
 **TaskGroupCreationForm**
@@ -44,11 +38,11 @@
 **create_task_group**
 - Renders form for task creation
 - On template selection, reloads page with `template_id` to show token fields
-- Checks `debug_mode` from TaskPlannerSettings
+- Checks `DEBUG_TASK_CREATION` from Django settings
 - On submission:
   - If debug mode enabled: prints task structure to stderr
   - If debug mode disabled: calls Todoist API to create tasks with token substitution
-- Requires `TODOIST_API_TOKEN` in settings (only when debug mode is disabled)
+- Requires `TODOIST_API_TOKEN` environment variable (only when debug mode is disabled)
 
 **create_tasks_from_template**
 - Iterates through template's tasks and creates them via API or prints debug info
@@ -96,20 +90,20 @@
 
 **Settings** (`taskplanner/settings.py`)
 - Added Wagtail apps and dependencies to `INSTALLED_APPS`
-- Added `wagtail.contrib.settings` to `INSTALLED_APPS` for admin-configurable settings
 - Added `tasks` app to `INSTALLED_APPS`
 - Added Wagtail redirect middleware
-- Added `wagtail.contrib.settings.context_processors.settings` to template context processors
 - Configured `WAGTAIL_SITE_NAME` and `WAGTAILADMIN_BASE_URL`
 - Configured `MEDIA_ROOT` and `MEDIA_URL`
-
-**Admin-configurable settings** (Wagtail Admin → Settings → Task Planner Settings):
-- `debug_mode`: Enable debug mode to print task info instead of posting to Todoist
+- Configured `python-dotenv` to load environment variables from `.env` file
+- Added `TODOIST_API_TOKEN` and `DEBUG_TASK_CREATION` settings from environment variables
 
 **Environment variables** (configure in `.env` file):
 - `TODOIST_API_TOKEN`: API token for Todoist integration (required when debug mode is disabled)
   - Get your token from https://todoist.com/app/settings/integrations/developer
   - Copy `.env.example` to `.env` and add your token
+- `DEBUG_TASK_CREATION`: Enable debug mode to print task info instead of posting to Todoist (default: False)
+  - Set to `True`, `1`, or `yes` to enable debug mode
+  - Useful for testing task templates without creating actual tasks
 
 ## Workflow
 
@@ -123,12 +117,11 @@
 ## Testing
 
 **Test coverage** (`tasks/tests.py`)
-- 18 tests for TaskGroupCreationForm and TaskGroupTemplate model
+- Tests for TaskGroupCreationForm and TaskGroupTemplate model
 - Tests dynamic field generation based on tokens
 - Tests form validation and token value extraction
 - Tests template field pre-population when template_id is provided
 - Tests model's `get_token_list()` method with various inputs
-- Tests Wagtail hooks for applying default tokens
 - Uses pytest with pytest-django plugin
 - Run tests: `uv run pytest tasks/tests.py -v`
 

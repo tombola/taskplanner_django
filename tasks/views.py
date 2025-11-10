@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.conf import settings
 from todoist_api_python.api import TodoistAPI
-from .models import TaskGroupTemplate, TaskPlannerSettings
+from .models import TaskGroupTemplate
 from .forms import TaskGroupCreationForm
 import sys
 
@@ -19,13 +19,8 @@ def create_task_group(request):
             template = form.cleaned_data['task_group_template']
             token_values = form.get_token_values()
 
-            # Check debug mode from settings
-            try:
-                site = template.get_site()
-                planner_settings = TaskPlannerSettings.for_site(site)
-                debug_mode = planner_settings.debug_mode
-            except (TaskPlannerSettings.DoesNotExist, AttributeError):
-                debug_mode = False
+            # Check debug mode from Django settings
+            debug_mode = getattr(settings, 'DEBUG_TASK_CREATION', False)
 
             # Create tasks via Todoist API or debug print
             try:

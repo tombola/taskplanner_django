@@ -7,7 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Environment Setup
 This project uses `uv` for Python version and virtual environment management.
 
+**Python Version**: Requires Python 3.13.x (not 3.14+)
+- Python 3.14 introduced breaking changes to `dataclasses.field()` that are incompatible with the `dataclass-wizard` library used by `todoist-api-python`
+
 ```bash
+# Install Python 3.13 if needed
+uv python install 3.13
+
 # Install dependencies
 uv sync
 
@@ -79,8 +85,6 @@ uv run python manage.py createsuperuser
 ### Wagtail Admin
 ```bash
 # Access Wagtail admin at http://localhost:8000/admin/
-# Configure Task Planner settings: Settings → Task Planner Settings
-#   - debug_mode: Enable to print debug info instead of posting to Todoist API
 ```
 
 ## Architecture Notes

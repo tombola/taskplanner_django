@@ -3,7 +3,6 @@ from wagtail.models import Page
 from wagtail.fields import StreamField
 from wagtail.admin.panels import FieldPanel
 from wagtail import blocks
-from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 
 
 class TaskBlock(blocks.StructBlock):
@@ -54,18 +53,3 @@ class TaskGroupTemplate(Page):
         return [token.strip() for token in self.tokens.split(',') if token.strip()]
 
 
-@register_setting
-class TaskPlannerSettings(BaseSiteSetting):
-    """Site-specific settings for Task Planner"""
-
-    debug_mode = models.BooleanField(
-        default=False,
-        help_text="Enable debug mode to print task creation info instead of posting to Todoist API"
-    )
-
-    panels = [
-        FieldPanel('debug_mode'),
-    ]
-
-    class Meta:
-        verbose_name = 'Task Planner Settings'

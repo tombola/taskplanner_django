@@ -158,3 +158,7 @@ MEDIA_URL = '/media/'
 
 # Todoist API
 TODOIST_API_TOKEN = os.getenv('TODOIST_API_TOKEN', '')
+
+# Task creation debug mode
+# When True, task creation will print debug info to console instead of posting to Todoist API
+DEBUG_TASK_CREATION = os.getenv('DEBUG_TASK_CREATION', 'False').lower() in ('true', '1', 'yes')
