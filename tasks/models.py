@@ -40,9 +40,15 @@ class TaskPlannerSettings(BaseSiteSetting):
         help_text="Title template for parent task (can use tokens like {SKU}). If empty, uses the template page title."
     )
 
+    description = models.TextField(
+        blank=True,
+        help_text="Description template for parent task (can use tokens like {SKU}). This will be prepended to the template description."
+    )
+
     panels = [
         FieldPanel('tokens'),
         FieldPanel('parent_task_title'),
+        FieldPanel('description'),
     ]
 
     class Meta:
@@ -58,11 +64,17 @@ class TaskPlannerSettings(BaseSiteSetting):
 class TaskGroupTemplate(Page):
     """Wagtail page type for task group templates"""
 
+    description = models.TextField(
+        blank=True,
+        help_text="Description for this template (can use tokens like {SKU}). This will be appended to the site-wide description."
+    )
+
     tasks = StreamField([
         ('task', TaskBlock()),
     ], blank=True, use_json_field=True)
 
     content_panels = Page.content_panels + [
+        FieldPanel('description'),
         FieldPanel('tasks'),
     ]
 

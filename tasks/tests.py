@@ -26,7 +26,8 @@ def planner_settings(db, wagtail_site):
     settings = TaskPlannerSettings.objects.create(
         site=wagtail_site,
         tokens='SKU, VARIETYNAME',
-        parent_task_title=''
+        parent_task_title='',
+        description=''
     )
     return settings
 
@@ -37,7 +38,8 @@ def empty_planner_settings(db, wagtail_site):
     settings = TaskPlannerSettings.objects.create(
         site=wagtail_site,
         tokens='',
-        parent_task_title=''
+        parent_task_title='',
+        description=''
     )
     return settings
 
@@ -50,6 +52,7 @@ def task_group_template(db, wagtail_site, planner_settings):
     template = TaskGroupTemplate(
         title='Test Chilli Template',
         slug='test-chilli',
+        description='',
         tasks=[
             {
                 'type': 'task',
@@ -90,6 +93,7 @@ def empty_template(db, wagtail_site, empty_planner_settings):
     template = TaskGroupTemplate(
         title='Empty Template',
         slug='empty-template',
+        description='',
         tasks=[],
         live=True
     )

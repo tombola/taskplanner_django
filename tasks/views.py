@@ -86,14 +86,40 @@ def create_tasks_from_template(api, template, token_values, site, debug=False):
     for token, value in token_values.items():
         parent_title = parent_title.replace(f'{{{token}}}', value)
 
+    # Build parent task description from both settings and template descriptions
+    description_parts = []
+
+    # Add site-wide description first (if exists)
+    if planner_settings.description:
+        site_description = planner_settings.description
+        for token, value in token_values.items():
+            site_description = site_description.replace(f'{{{token}}}', value)
+        description_parts.append(site_description)
+
+    # Add template description second (if exists)
+    if template.description:
+        template_description = template.description
+        for token, value in token_values.items():
+            template_description = template_description.replace(f'{{{token}}}', value)
+        description_parts.append(template_description)
+
+    # Combine descriptions with double newline separator
+    parent_description = '\n\n'.join(description_parts) if description_parts else ''
+
     # Create parent task from template page
     task_params = {
         'content': parent_title,
     }
 
+    # Only add description if there is one
+    if parent_description:
+        task_params['description'] = parent_description
+
     if debug:
         # Debug mode: print parent task info
         print(f"Parent Task: {parent_title}", file=sys.stderr)
+        if parent_description:
+            print(f"  Description: {parent_description}", file=sys.stderr)
 
         # Create a mock task object with just an id
         class MockTask:

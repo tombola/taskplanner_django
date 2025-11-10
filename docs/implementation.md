@@ -21,10 +21,12 @@
 - Site-wide settings configurable in Wagtail admin under Settings → Task Planner Settings
 - `tokens`: CharField containing comma-separated token names (e.g., "SKU, VARIETYNAME")
 - `parent_task_title`: Optional title template for parent task (can use tokens). If empty, uses template page title
+- `description`: Optional description template for parent task (can use tokens). Prepended to template description
 - `get_token_list()`: Helper method to parse comma-separated tokens into a list
 
 **TaskGroupTemplate** (Wagtail Page model)
 - Wagtail page type for creating task templates
+- `description`: Optional description for the template (can use tokens). Appended to site-wide description
 - `tasks`: StreamField containing TaskBlocks for the task structure
 - Tokens are defined in TaskPlannerSettings (site-wide), not per-page
 
@@ -54,11 +56,15 @@
 - Creates a parent task using either:
   - `parent_task_title` from TaskPlannerSettings (if configured), or
   - Template page title as fallback
-- Applies token substitution to the parent task title
+- Builds parent task description by combining:
+  - Site-wide description from TaskPlannerSettings (first)
+  - Template description (second)
+  - Both separated by double newline, both support token substitution
+- Applies token substitution to both title and description
 - Iterates through template's tasks and creates them as subtasks of the parent task
 - Accepts `site` parameter to access settings
 - Accepts `debug` parameter to control behavior
-- Prints debug header/footer when in debug mode
+- Prints debug header/footer when in debug mode (includes description in output)
 
 **create_task_recursive**
 - Recursively creates tasks and subtasks
@@ -121,13 +127,16 @@
 1. Configure site-wide settings in Wagtail admin (Settings → Task Planner Settings):
    - Define tokens (comma-separated, e.g., "SKU, VARIETYNAME")
    - Optionally define parent_task_title template (e.g., "Plant {VARIETYNAME}")
+   - Optionally define description template (e.g., "Variety: {VARIETYNAME}")
 2. Create TaskGroupTemplate pages in Wagtail admin
-3. Define task structure with nested subtasks (tokens from site settings can be used)
-4. Navigate to `/tasks/create/`
-5. Select template from dropdown (page reloads showing token input fields based on site settings)
-6. Fill in token values
-7. Submit form to create tasks via Todoist API:
+3. Define template description (optional, can use tokens)
+4. Define task structure with nested subtasks (tokens from site settings can be used)
+5. Navigate to `/tasks/create/`
+6. Select template from dropdown (page reloads showing token input fields based on site settings)
+7. Fill in token values
+8. Submit form to create tasks via Todoist API:
    - The parent task uses `parent_task_title` from settings (or template page title as fallback)
+   - Parent task description combines site description + template description (both tokenized)
    - All tasks defined in the template become subtasks of the parent task
    - Subtasks defined within tasks become nested subtasks
 
@@ -136,8 +145,10 @@
 Settings:
   - Tokens: "SKU, VARIETYNAME"
   - Parent Task Title: "Plant {VARIETYNAME}"
+  - Description: "SKU: {SKU}\nVariety: {VARIETYNAME}"
 
 Template: "Tomato Template"
+Template Description: "This is the standard planting workflow for {VARIETYNAME}."
 Tasks in template:
   - "Sow seeds"
     - "Prepare soil"
@@ -148,6 +159,12 @@ With tokens: SKU="TOM001", VARIETYNAME="Tomato"
 
 Result in Todoist:
 └─ Plant Tomato                    (from parent_task_title setting)
+   Description:
+   SKU: TOM001
+   Variety: Tomato
+
+   This is the standard planting workflow for Tomato.
+
    ├─ Sow seeds                     (from template tasks)
    │  ├─ Prepare soil               (nested subtask)
    │  └─ Plant seeds                (nested subtask)
