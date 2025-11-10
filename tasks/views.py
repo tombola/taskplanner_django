@@ -52,9 +52,18 @@ def create_task_group(request):
     else:
         form = TaskGroupCreationForm(template_id=template_id, site=site)
 
+    # Get the selected template for displaying task structure
+    selected_template = None
+    if template_id:
+        try:
+            selected_template = TaskGroupTemplate.objects.get(id=template_id)
+        except TaskGroupTemplate.DoesNotExist:
+            pass
+
     return render(request, 'tasks/create_task_group.html', {
         'form': form,
         'template_id': template_id,
+        'selected_template': selected_template,
     })
 
 

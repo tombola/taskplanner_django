@@ -14,7 +14,7 @@ class TaskGroupCreationForm(forms.Form):
     description = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 3}),
         required=False,
-        help_text="Optional additional description (can use tokens). This will be appended to the site and template descriptions."
+        help_text="Optional additional description (with tokens)."
     )
 
     def __init__(self, *args, **kwargs):

@@ -47,6 +47,10 @@
 **create_task_group**
 - Renders form for task creation
 - On template selection, reloads page with `template_id` to show token fields
+- Displays task structure preview when a template is selected, showing:
+  - All tasks that will be created
+  - Subtasks for each task
+  - Labels for tasks and subtasks
 - Checks `DEBUG_TASK_CREATION` from Django settings
 - On submission:
   - If debug mode enabled: prints task structure to stderr
@@ -92,6 +96,10 @@
 **tasks/templates/tasks/create_task_group.html**
 - Form for selecting template and entering token values
 - JavaScript event listener: when template selected, reloads page with `template_id` query param to dynamically show token input fields
+- Displays task structure preview when template is selected:
+  - Shows all tasks and subtasks that will be created
+  - Displays labels for each task/subtask
+  - Provides visual hierarchy with indentation and styling
 - Displays success/error messages
 - External CSS: `tasks/static/tasks/css/styles.css`
 
