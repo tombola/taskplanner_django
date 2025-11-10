@@ -11,6 +11,12 @@ class TaskGroupCreationForm(forms.Form):
         help_text="Select a task group template"
     )
 
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3}),
+        required=False,
+        help_text="Optional additional description (can use tokens). This will be appended to the site and template descriptions."
+    )
+
     def __init__(self, *args, **kwargs):
         template_id = kwargs.pop('template_id', None)
         site = kwargs.pop('site', None)
@@ -36,7 +42,7 @@ class TaskGroupCreationForm(forms.Form):
                     self.fields[field_name] = forms.CharField(
                         label=token,
                         required=True,
-                        help_text=f"Value for {token} token"
+                        # help_text=f"Value for {token} token"
                     )
             except TaskGroupTemplate.DoesNotExist:
                 pass

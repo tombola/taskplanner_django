@@ -109,20 +109,22 @@ class TestTaskGroupCreationForm:
     """Tests for TaskGroupCreationForm"""
 
     def test_form_init_without_template_id(self):
-        """Form should initialize with only task_group_template field"""
+        """Form should initialize with task_group_template and description fields"""
         form = TaskGroupCreationForm()
 
         assert 'task_group_template' in form.fields
-        assert len(form.fields) == 1
+        assert 'description' in form.fields
+        assert len(form.fields) == 2
 
     def test_form_init_with_template_id(self, task_group_template, wagtail_site):
         """Form should create dynamic token fields when template_id provided"""
         form = TaskGroupCreationForm(template_id=task_group_template.id, site=wagtail_site)
 
         assert 'task_group_template' in form.fields
+        assert 'description' in form.fields
         assert 'token_SKU' in form.fields
         assert 'token_VARIETYNAME' in form.fields
-        assert len(form.fields) == 3
+        assert len(form.fields) == 4
 
     def test_dynamic_field_labels(self, task_group_template, wagtail_site):
         """Dynamic token fields should have correct labels"""
@@ -142,17 +144,19 @@ class TestTaskGroupCreationForm:
         """Form should handle invalid template_id gracefully"""
         form = TaskGroupCreationForm(template_id=99999, site=wagtail_site)
 
-        # Should only have base field, no dynamic fields added
+        # Should only have base fields, no dynamic token fields added
         assert 'task_group_template' in form.fields
-        assert len(form.fields) == 1
+        assert 'description' in form.fields
+        assert len(form.fields) == 2
 
     def test_form_with_empty_tokens(self, empty_template, wagtail_site):
         """Form should handle template with no tokens in settings"""
         form = TaskGroupCreationForm(template_id=empty_template.id, site=wagtail_site)
 
-        # Should only have base field
+        # Should only have base fields
         assert 'task_group_template' in form.fields
-        assert len(form.fields) == 1
+        assert 'description' in form.fields
+        assert len(form.fields) == 2
 
     def test_form_validation_success(self, task_group_template, wagtail_site):
         """Form should validate successfully with correct data"""

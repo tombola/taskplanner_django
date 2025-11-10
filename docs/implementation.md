@@ -34,6 +34,7 @@
 
 **TaskGroupCreationForm**
 - `task_group_template`: ModelChoiceField to select template
+- `description`: Optional textarea for additional description (can use tokens). Appended to site and template descriptions
 - Dynamically generates fields based on tokens from TaskPlannerSettings (site-wide)
 - When `template_id` and `site` are provided:
   - Pre-populates the `task_group_template` field with the specified template
@@ -56,13 +57,15 @@
 - Creates a parent task using either:
   - `parent_task_title` from TaskPlannerSettings (if configured), or
   - Template page title as fallback
-- Builds parent task description by combining:
-  - Site-wide description from TaskPlannerSettings (first)
-  - Template description (second)
-  - Both separated by double newline, both support token substitution
+- Builds parent task description by combining (in order):
+  1. Site-wide description from TaskPlannerSettings
+  2. Template description from TaskGroupTemplate
+  3. Form description from TaskGroupCreationForm
+  - All separated by double newline, all support token substitution
 - Applies token substitution to both title and description
 - Iterates through template's tasks and creates them as subtasks of the parent task
 - Accepts `site` parameter to access settings
+- Accepts `form_description` parameter from the creation form
 - Accepts `debug` parameter to control behavior
 - Prints debug header/footer when in debug mode (includes description in output)
 
@@ -134,9 +137,10 @@
 5. Navigate to `/tasks/create/`
 6. Select template from dropdown (page reloads showing token input fields based on site settings)
 7. Fill in token values
-8. Submit form to create tasks via Todoist API:
+8. Optionally add a form-specific description (can use tokens)
+9. Submit form to create tasks via Todoist API:
    - The parent task uses `parent_task_title` from settings (or template page title as fallback)
-   - Parent task description combines site description + template description (both tokenized)
+   - Parent task description combines: site description + template description + form description (all tokenized)
    - All tasks defined in the template become subtasks of the parent task
    - Subtasks defined within tasks become nested subtasks
 
@@ -155,7 +159,10 @@ Tasks in template:
     - "Plant seeds"
   - "Water plants"
 
-With tokens: SKU="TOM001", VARIETYNAME="Tomato"
+Form input:
+  - SKU="TOM001"
+  - VARIETYNAME="Tomato"
+  - Description="Planting date: 2025-03-15"
 
 Result in Todoist:
 └─ Plant Tomato                    (from parent_task_title setting)
@@ -164,6 +171,8 @@ Result in Todoist:
    Variety: Tomato
 
    This is the standard planting workflow for Tomato.
+
+   Planting date: 2025-03-15
 
    ├─ Sow seeds                     (from template tasks)
    │  ├─ Prepare soil               (nested subtask)

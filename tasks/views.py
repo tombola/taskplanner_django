@@ -22,6 +22,7 @@ def create_task_group(request):
         if form.is_valid():
             template = form.cleaned_data['task_group_template']
             token_values = form.get_token_values()
+            form_description = form.cleaned_data.get('description', '')
 
             # Check debug mode from Django settings
             debug_mode = getattr(settings, 'DEBUG_TASK_CREATION', False)
@@ -30,7 +31,7 @@ def create_task_group(request):
             try:
                 if debug_mode:
                     # Debug mode: print to console instead of posting
-                    created_tasks = create_tasks_from_template(None, template, token_values, site, debug=True)
+                    created_tasks = create_tasks_from_template(None, template, token_values, site, form_description, debug=True)
                     messages.success(request, f'DEBUG MODE: Printed {len(created_tasks)} tasks to console')
                 else:
                     # Normal mode: post to Todoist API
@@ -40,7 +41,7 @@ def create_task_group(request):
                         return redirect('tasks:create_task_group')
 
                     api = TodoistAPI(api_token)
-                    created_tasks = create_tasks_from_template(api, template, token_values, site, debug=False)
+                    created_tasks = create_tasks_from_template(api, template, token_values, site, form_description, debug=False)
                     messages.success(request, f'Successfully created {len(created_tasks)} tasks')
 
                 return redirect('tasks:create_task_group')
@@ -57,7 +58,7 @@ def create_task_group(request):
     })
 
 
-def create_tasks_from_template(api, template, token_values, site, debug=False):
+def create_tasks_from_template(api, template, token_values, site, form_description='', debug=False):
     """Create Todoist tasks from template with token substitution
 
     Args:
@@ -65,6 +66,7 @@ def create_tasks_from_template(api, template, token_values, site, debug=False):
         template: TaskGroupTemplate instance
         token_values: Dict of token replacements
         site: Wagtail Site instance for accessing settings
+        form_description: Optional description from the creation form
         debug: If True, print debug info instead of posting to API
     """
     created_tasks = []
@@ -86,7 +88,7 @@ def create_tasks_from_template(api, template, token_values, site, debug=False):
     for token, value in token_values.items():
         parent_title = parent_title.replace(f'{{{token}}}', value)
 
-    # Build parent task description from both settings and template descriptions
+    # Build parent task description from settings, template, and form descriptions
     description_parts = []
 
     # Add site-wide description first (if exists)
@@ -102,6 +104,13 @@ def create_tasks_from_template(api, template, token_values, site, debug=False):
         for token, value in token_values.items():
             template_description = template_description.replace(f'{{{token}}}', value)
         description_parts.append(template_description)
+
+    # Add form description third (if exists)
+    if form_description:
+        form_desc = form_description
+        for token, value in token_values.items():
+            form_desc = form_desc.replace(f'{{{token}}}', value)
+        description_parts.append(form_desc)
 
     # Combine descriptions with double newline separator
     parent_description = '\n\n'.join(description_parts) if description_parts else ''
