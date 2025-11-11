@@ -68,6 +68,54 @@ button:hover {
     font-weight: normal;
 }
 
+/* Description preview section */
+.description-preview {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e8f4f8;
+    border: 1px solid #b8dce8;
+    border-radius: 5px;
+}
+
+.description-preview h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.description-content {
+    background: white;
+    padding: 15px;
+    border-radius: 3px;
+}
+
+.description-section {
+    margin-bottom: 15px;
+}
+
+.description-section:last-child {
+    margin-bottom: 0;
+}
+
+.description-section strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.description-text {
+    margin: 0;
+    padding: 10px;
+    background: #f9f9f9;
+    border-left: 3px solid #007bff;
+    border-radius: 3px;
+    white-space: pre-wrap;
+    font-family: inherit;
+    color: #333;
+}
+
 /* Task preview section */
 .task-preview {
     margin-top: 30px;

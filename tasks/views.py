@@ -88,10 +88,14 @@ def create_task_group(request):
         except TaskGroupTemplate.DoesNotExist:
             pass
 
+    # Get planner settings for displaying descriptions
+    planner_settings = TaskPlannerSettings.for_site(site)
+
     return render(request, 'tasks/create_task_group.html', {
         'form': form,
         'template_id': template_id,
         'selected_template': selected_template,
+        'planner_settings': planner_settings,
     })
 
 

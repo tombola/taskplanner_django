@@ -12,6 +12,7 @@ class TaskGroupCreationForm(forms.Form):
     )
 
     description = forms.CharField(
+        label="Additional description",
         widget=forms.Textarea(attrs={'rows': 3}),
         required=False,
         help_text="Optional additional description (with tokens)."

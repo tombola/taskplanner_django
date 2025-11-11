@@ -23,23 +23,71 @@
         <input type="hidden" name="template_id" value="{{ template_id }}">
         {% endif %}
 
-        {% for field in form %}
+        {# Render task_group_template field first #}
         <div>
-            <label for="{{ field.id_for_label }}">
-                {{ field.label }}
-                {% if field.help_text %}
-                <span class="help-text">{{ field.help_text }}</span>
+            <label for="{{ form.task_group_template.id_for_label }}">
+                {{ form.task_group_template.label }}
+                {% if form.task_group_template.help_text %}
+                <span class="help-text">{{ form.task_group_template.help_text }}</span>
                 {% endif %}
             </label>
 
-            {{ field }}
+            {{ form.task_group_template }}
 
-            {% if field.errors %}
+            {% if form.task_group_template.errors %}
             <div class="error">
-                {{ field.errors }}
+                {{ form.task_group_template.errors }}
             </div>
             {% endif %}
         </div>
+
+        {# Show description preview after template field #}
+        {% if selected_template %}
+        <div class="description-preview">
+            <label>Parent task description:</label>
+
+            {% if planner_settings.description or selected_template.description %}
+            <div class="description-content">
+                {% if planner_settings.description %}
+                <div class="description-section">
+                    <strong>Settings:</strong>
+                    <p class="description-text">{{ planner_settings.description }}</p>
+                </div>
+                {% endif %}
+
+                {% if selected_template.description %}
+                <div class="description-section">
+                    <strong>Template:</strong>
+                    <p class="description-text">{{ selected_template.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <p class="help-text">No description configured in settings or template.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {# Render remaining fields (description and token fields) #}
+        {% for field in form %}
+            {% if field.name != 'task_group_template' %}
+            <div>
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if field.help_text %}
+                    <span class="help-text">{{ field.help_text }}</span>
+                    {% endif %}
+                </label>
+
+                {{ field }}
+
+                {% if field.errors %}
+                <div class="error">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
         {% endfor %}
 
         {% if template_id %}
