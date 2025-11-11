@@ -27,7 +27,8 @@ def planner_settings(db, wagtail_site):
         site=wagtail_site,
         tokens='SKU, VARIETYNAME',
         parent_task_title='',
-        description=''
+        description='',
+        todoist_project_id=''
     )
     return settings
 
@@ -39,7 +40,8 @@ def empty_planner_settings(db, wagtail_site):
         site=wagtail_site,
         tokens='',
         parent_task_title='',
-        description=''
+        description='',
+        todoist_project_id=''
     )
     return settings
 

@@ -22,6 +22,7 @@
 - `tokens`: CharField containing comma-separated token names (e.g., "SKU, VARIETYNAME")
 - `parent_task_title`: Optional title template for parent task (can use tokens). If empty, uses template page title
 - `description`: Optional description template for parent task (can use tokens). Prepended to template description
+- `todoist_project_id`: Optional Todoist project ID where tasks should be created. If empty, tasks are created in inbox
 - `get_token_list()`: Helper method to parse comma-separated tokens into a list
 
 **TaskGroupTemplate** (Wagtail Page model)
@@ -67,11 +68,12 @@
   3. Form description from TaskGroupCreationForm
   - All separated by double newline, all support token substitution
 - Applies token substitution to both title and description
+- Adds `project_id` to task if `todoist_project_id` is specified in settings
 - Iterates through template's tasks and creates them as subtasks of the parent task
 - Accepts `site` parameter to access settings
 - Accepts `form_description` parameter from the creation form
 - Accepts `debug` parameter to control behavior
-- Prints debug header/footer when in debug mode (includes description in output)
+- Prints debug header/footer when in debug mode (includes description and project_id in output)
 
 **create_task_recursive**
 - Recursively creates tasks and subtasks
@@ -139,6 +141,7 @@
    - Define tokens (comma-separated, e.g., "SKU, VARIETYNAME")
    - Optionally define parent_task_title template (e.g., "Plant {VARIETYNAME}")
    - Optionally define description template (e.g., "Variety: {VARIETYNAME}")
+   - Optionally define todoist_project_id (e.g., "2331696983") to organize tasks in a specific project
 2. Create TaskGroupTemplate pages in Wagtail admin
 3. Define template description (optional, can use tokens)
 4. Define task structure with nested subtasks (tokens from site settings can be used)

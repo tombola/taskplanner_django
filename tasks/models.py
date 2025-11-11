@@ -45,10 +45,17 @@ class TaskPlannerSettings(BaseSiteSetting):
         help_text="Description template for parent task (can use tokens like {SKU}). This will be prepended to the template description."
     )
 
+    todoist_project_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Todoist project ID where tasks should be created. Leave empty to create tasks in the inbox."
+    )
+
     panels = [
         FieldPanel('tokens'),
         FieldPanel('parent_task_title'),
         FieldPanel('description'),
+        FieldPanel('todoist_project_id'),
     ]
 
     class Meta:

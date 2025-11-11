@@ -47,7 +47,35 @@ def create_task_group(request):
                 return redirect('tasks:create_task_group')
 
             except Exception as e:
-                messages.error(request, f'Error creating tasks: {str(e)}')
+                error_message = str(e)
+
+                # Provide more helpful error messages for common issues
+                if '400 Client Error: Bad Request' in error_message:
+                    planner_settings = TaskPlannerSettings.for_site(site)
+                    if planner_settings.todoist_project_id:
+                        messages.error(
+                            request,
+                            f'Invalid Todoist project ID: "{planner_settings.todoist_project_id}". '
+                            'Please run "python manage.py list_todoist_projects" to see valid project IDs, '
+                            'then update the project ID in Settings → Task Planner Settings.'
+                        )
+                    else:
+                        messages.error(
+                            request,
+                            'Invalid request to Todoist API. Please check your task template configuration.'
+                        )
+                elif '401' in error_message or 'Unauthorized' in error_message:
+                    messages.error(
+                        request,
+                        'Todoist API authentication failed. Please check your API token in Settings.'
+                    )
+                elif '403' in error_message or 'Forbidden' in error_message:
+                    messages.error(
+                        request,
+                        'Permission denied. Your Todoist API token may not have access to this project.'
+                    )
+                else:
+                    messages.error(request, f'Error creating tasks: {error_message}')
 
     else:
         form = TaskGroupCreationForm(template_id=template_id, site=site)
@@ -133,11 +161,17 @@ def create_tasks_from_template(api, template, token_values, site, form_descripti
     if parent_description:
         task_params['description'] = parent_description
 
+    # Add project_id if specified in settings
+    if planner_settings.todoist_project_id:
+        task_params['project_id'] = planner_settings.todoist_project_id
+
     if debug:
         # Debug mode: print parent task info
         print(f"Parent Task: {parent_title}", file=sys.stderr)
         if parent_description:
             print(f"  Description: {parent_description}", file=sys.stderr)
+        if planner_settings.todoist_project_id:
+            print(f"  Project ID: {planner_settings.todoist_project_id}", file=sys.stderr)
 
         # Create a mock task object with just an id
         class MockTask:

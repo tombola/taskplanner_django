@@ -89,6 +89,7 @@ uv run python manage.py createsuperuser
 #   - tokens: Comma-separated list of tokens (e.g., SKU, VARIETYNAME)
 #   - parent_task_title: Optional title template for parent task (uses template title if empty)
 #   - description: Optional description template for parent task (prepended to template description)
+#   - todoist_project_id: Optional Todoist project ID for task organization (uses inbox if empty)
 ```
 
 ## Architecture Notes
