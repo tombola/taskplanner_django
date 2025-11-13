@@ -1,9 +1,11 @@
 from django.db import models
 from wagtail.models import Page
 from wagtail.fields import StreamField
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail import blocks
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
+from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
 
 
 class TaskBlock(blocks.StructBlock):
@@ -24,8 +26,47 @@ class TaskBlock(blocks.StructBlock):
         label = 'Task'
 
 
+class LabelSectionRule(models.Model):
+    """Rule for moving completed tasks to different sections based on label"""
+
+    settings = ParentalKey(
+        'TaskPlannerSettings',
+        on_delete=models.CASCADE,
+        related_name='label_section_rules'
+    )
+
+    source_section_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Todoist section ID to monitor for completed tasks with this label"
+    )
+
+    label = models.CharField(
+        max_length=100,
+        help_text="Label to match (e.g., 'harvest', 'plant')"
+    )
+
+    destination_section_id = models.CharField(
+        max_length=100,
+        help_text="Todoist section ID where completed tasks with this label should be moved"
+    )
+
+    panels = [
+        FieldPanel('source_section_id'),
+        FieldPanel('label'),
+        FieldPanel('destination_section_id'),
+    ]
+
+    class Meta:
+        verbose_name = 'Label Section Rule'
+        verbose_name_plural = 'Label Section Rules'
+
+    def __str__(self):
+        return f"Section {self.source_section_id}: {self.label} → Section {self.destination_section_id}"
+
+
 @register_setting
-class TaskPlannerSettings(BaseSiteSetting):
+class TaskPlannerSettings(ClusterableModel, BaseSiteSetting):
     """Site-wide settings for task planner"""
 
     tokens = models.CharField(
@@ -56,6 +97,7 @@ class TaskPlannerSettings(BaseSiteSetting):
         FieldPanel('parent_task_title'),
         FieldPanel('description'),
         FieldPanel('todoist_project_id'),
+        InlinePanel('label_section_rules', label="Label Section Rules", heading="Rules for moving completed tasks between sections"),
     ]
 
     class Meta:
@@ -89,5 +131,3 @@ class TaskGroupTemplate(Page):
 
     class Meta:
         verbose_name = 'Task Group Template'
-
-
