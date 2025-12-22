@@ -145,6 +145,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+# Directory where static files will be collected for production
+STATIC_ROOT = BASE_DIR / 'static'
+
 # Configure static URL with path prefix if behind reverse proxy
 if FORCE_SCRIPT_NAME:
     STATIC_URL = f'{FORCE_SCRIPT_NAME}/static/'
