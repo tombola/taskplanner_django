@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-(llgrb%l(e1#2^i3ol0=&-seca+($xbm=(gq9@1s&c@w_r%%&b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['allotmentplotter.uk', 'www.allotmentplotter.uk', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['tasks.allotmentplotter.uk', 'tasks.localhost', 'localhost', '127.0.0.1']
 
 
 # Application definition
