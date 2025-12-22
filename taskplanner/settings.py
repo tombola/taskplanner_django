@@ -32,6 +32,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['tasks.allotmentplotter.uk', 'tasks.localhost', 'localhost', '127.0.0.1']
 
+# CSRF trusted origins for subdomain routing
+CSRF_TRUSTED_ORIGINS = [
+    'https://tasks.allotmentplotter.uk',
+    'https://tasks.localhost',
+    'https://localhost',
+]
 
 # Application definition
 
