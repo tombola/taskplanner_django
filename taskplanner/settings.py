@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-(llgrb%l(e1#2^i3ol0=&-seca+($xbm=(gq9@1s&c@w_r%%&b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['allotmentplotter.uk', 'www.allotmentplotter.uk', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -76,6 +76,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'taskplanner.urls'
+
+# URL prefix for reverse proxy deployment
+# Set to None for local development, '/tasks' for production
+FORCE_SCRIPT_NAME = os.getenv('FORCE_SCRIPT_NAME', None)
 
 TEMPLATES = [
     {
@@ -141,7 +145,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# Configure static URL with path prefix if behind reverse proxy
+if FORCE_SCRIPT_NAME:
+    STATIC_URL = f'{FORCE_SCRIPT_NAME}/static/'
+else:
+    STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -150,11 +158,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Wagtail settings
 WAGTAIL_SITE_NAME = 'Task Planner'
-WAGTAILADMIN_BASE_URL = 'http://localhost:8000'
+# Update this for production deployment
+WAGTAILADMIN_BASE_URL = os.getenv('WAGTAILADMIN_BASE_URL', 'http://localhost:8000')
 
 # Media files
 MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = '/media/'
+# Configure media URL with path prefix if behind reverse proxy
+if FORCE_SCRIPT_NAME:
+    MEDIA_URL = f'{FORCE_SCRIPT_NAME}/media/'
+else:
+    MEDIA_URL = '/media/'
 
 # Todoist API
 TODOIST_API_TOKEN = os.getenv('TODOIST_API_TOKEN', '')
