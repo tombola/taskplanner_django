@@ -1,6 +1,7 @@
 /* Base layout */
 :root {
   --header-color: transparent;
+  --body-text-color: #444;
 }
 
 body {
@@ -11,7 +12,7 @@ body {
 }
 
 header {
-    background: #007bff;
+    background: var(--header-color);
     color: white;
     padding: 1rem 2rem;
 }
@@ -22,7 +23,7 @@ header nav {
 }
 
 header nav a {
-    color: white;
+    color: var(--body-text-color);
     text-decoration: none;
 }
 
