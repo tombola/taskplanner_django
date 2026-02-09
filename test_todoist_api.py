@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'taskplanner.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'taskplanner.settings.dev')
 import django
 django.setup()
 
