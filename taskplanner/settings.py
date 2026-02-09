@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-(llgrb%l(e1#2^i3ol0=&-seca+($xbm=(gq9@1s&c@w_r%%&b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['tasks.allotmentplotter.uk', 'tasks.localhost', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['taskplanner.local', 'tasks.allotmentplotter.uk', 'tasks.localhost', 'localhost', '127.0.0.1']
 
 # CSRF trusted origins for subdomain routing
 CSRF_TRUSTED_ORIGINS = [
