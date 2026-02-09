@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Planner{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            {% block navigation %}
+            <a href="/">Home</a>
+            <a href="/admin/">Admin</a>
+            {% endblock %}
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        {% block footer %}
+        <p>&copy; 2025 Task Planner</p>
+        {% endblock %}
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

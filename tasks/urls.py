@@ -1,8 +1,8 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
 
 app_name = 'tasks'
 
 urlpatterns = [
-    path('create/', views.create_task_group, name='create_task_group'),
+    # Include todosync URLs
+    path('', include('todosync.urls')),
 ]

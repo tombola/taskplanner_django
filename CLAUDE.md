@@ -101,3 +101,52 @@ uv run python manage.py createsuperuser
 - URLs are configured in `urls.py` files at project and app levels
 - Admin interface configured in `admin.py` files for each app
 - Tests use pytest with pytest-django plugin
+
+### TodoSync Package Integration
+
+This project uses the `todosync` Django package for generic task management features:
+
+**Package Location:** `/Users/tom/projects/experiments/taskplanner/todosync_django`
+**Installed as:** Editable dependency via `uv add --editable ../todosync_django`
+
+#### Division of Responsibilities
+
+**Todosync Package (Generic Features):**
+- `BaseTaskGroupTemplate` - Base Wagtail Page model for task templates
+- `TaskSyncSettings` - Site-wide configuration (tokens, Todoist project ID)
+- `LabelActionRule` - Label-based routing rules for webhooks
+- `TaskGroup` - Tracks created task instances
+- `TaskBlock` - StreamField block for task definitions
+- Token substitution utilities
+- Views for task creation with direct Todoist API integration
+- Management commands: `list_todoist_projects`, `list_todoist_sections`
+
+**Taskplanner App (Domain-Specific):**
+- `CropTaskTemplate` - Extends `BaseTaskGroupTemplate` with `bed` field
+- `BiennialCropTaskTemplate` - Extends `CropTaskTemplate` with `bed_second_year` field
+- Application-specific business rules and validation
+- Custom templates extending package templates (if needed)
+
+#### When to Add Code
+
+**Add to Package if:**
+- Works with ANY domain (not just agriculture/crops)
+- Provides infrastructure for extension (base classes, hooks)
+- Implements core patterns (token substitution, templates)
+
+**Add to App if:**
+- Specific to agriculture/crop planning
+- Hardcoded business rules or crop-specific relationships
+- References beds, varieties, crops, or SKUs by name
+
+#### Multi-Table Inheritance
+
+Models use concrete child tables with explicit joins:
+
+```
+BaseTaskGroupTemplate (todosync package)
+└── CropTaskTemplate (tasks app)
+    └── BiennialCropTaskTemplate (tasks app)
+```
+
+Each model creates its own database table. No generic foreign keys are used.

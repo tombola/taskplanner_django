@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Task Planner - Home{% endblock %}
+
+{% block content %}
+<h1>Task Templates</h1>
+
+{% if templates %}
+<ul class="template-list">
+    {% for template in templates %}
+    <li>
+        <a href="{{ template.url }}">{{ template.title }}</a>
+        {% if template.description %}
+        <p class="template-description">{{ template.description }}</p>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No task templates available yet.</p>
+{% endif %}
+{% endblock %}

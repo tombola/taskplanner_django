@@ -23,13 +23,18 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+from tasks.views import home
+
 urlpatterns = [
     path('django-admin/', admin.site.urls),
     path('admin/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('tasks/', include('tasks.urls')),
-    path('', include(wagtail_urls)),
+    path('', home, name='home'),
+    path('pages/', include(wagtail_urls)),
+    path("todosync/", include("todosync.urls")),
 ]
 
 if settings.DEBUG:
+    urlpatterns += [path("__reload__/", include("django_browser_reload.urls"))]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
