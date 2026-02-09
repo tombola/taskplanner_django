@@ -32,6 +32,7 @@ urlpatterns = [
     path('tasks/', include('tasks.urls')),
     path('', home, name='home'),
     path('pages/', include(wagtail_urls)),
+    path("todosync/", include("todosync.urls")),
 ]
 
 if settings.DEBUG:
