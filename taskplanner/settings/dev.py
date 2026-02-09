@@ -21,6 +21,10 @@ DATABASES = {
     }
 }
 
+INSTALLED_APPS += ['django_browser_reload']  # noqa: F405
+
+MIDDLEWARE += ['django_browser_reload.middleware.BrowserReloadMiddleware']  # noqa: F405
+
 WAGTAILADMIN_BASE_URL = 'http://localhost:8000'
 
 # Task creation debug mode

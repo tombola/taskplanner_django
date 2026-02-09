@@ -17,3 +17,8 @@ dependencies = [
 
 [tool.uv.sources]
 todosync-django = { path = "../todosync_django", editable = true }
+
+[dependency-groups]
+dev = [
+    "django-browser-reload>=1.21.0",
+]
