@@ -11,7 +11,7 @@ class CropTaskViewSet(SnippetViewSet):
     menu_order = 200
     add_to_admin_menu = True
     add_to_settings_menu = False
-    list_display = ["variety_name", "sku", "bed", "todoist_id", "created_at"]
+    list_display = ["variety_name", "sku", "bed", "todoist_id", "completed", "section", "created_at"]
     list_filter = ["variety_name", "bed", "created_at"]
     search_fields = ["sku", "variety_name", "bed"]
     inspect_view_enabled = True
