@@ -66,6 +66,9 @@ INSTALLED_APPS = [
     'modelcluster',
     'taggit',
 
+    # Todosync package
+    'todosync',
+
     # Local apps
     'tasks',
 ]

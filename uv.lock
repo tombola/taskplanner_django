@@ -515,6 +515,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "rich" },
     { name = "todoist-api-python" },
+    { name = "todosync-django" },
     { name = "wagtail" },
 ]
 
@@ -526,6 +527,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "rich", specifier = ">=14.2.0" },
     { name = "todoist-api-python", specifier = ">=3.1.0" },
+    { name = "todosync-django", editable = "../todosync_django" },
     { name = "wagtail", specifier = ">=7.2" },
 ]
 
@@ -551,6 +553,32 @@ sdist = { url = "https://files.pythonhosted.org/packages/c6/db/7e31fa6e683cbdc5c
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/99/19c8fcaa0f691d41dc5687cb21432b7ea01175b9e4b4097a6caffedbe6b7/todoist_api_python-3.1.0-py3-none-any.whl", hash = "sha256:20ee2445983235566e7f2b2c82f769b9a265bb3fa6d7aad3fa73cf9e2d4cd787", size = 23102, upload-time = "2025-05-07T17:50:46.43Z" },
 ]
+
+[[package]]
+name = "todosync-django"
+version = "0.1.0"
+source = { editable = "../todosync_django" }
+dependencies = [
+    { name = "django" },
+    { name = "django-click" },
+    { name = "django-modelcluster" },
+    { name = "rich" },
+    { name = "todoist-api-python" },
+    { name = "wagtail" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "django", specifier = ">=5.0" },
+    { name = "django-click", specifier = ">=2.4.0" },
+    { name = "django-modelcluster", specifier = ">=6.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "pytest-django", marker = "extra == 'dev'" },
+    { name = "rich", specifier = ">=14.0.0" },
+    { name = "todoist-api-python", specifier = ">=3.1.0" },
+    { name = "wagtail", specifier = ">=6.0" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "typing-extensions"

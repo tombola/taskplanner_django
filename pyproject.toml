@@ -11,5 +11,9 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "rich>=14.2.0",
     "todoist-api-python>=3.1.0",
+    "todosync-django",
     "wagtail>=7.2",
 ]
+
+[tool.uv.sources]
+todosync-django = { path = "../todosync_django", editable = true }

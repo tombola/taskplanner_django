@@ -4,7 +4,10 @@
       "Bash(mkdir:*)",
       "Bash(uv run python:*)",
       "WebSearch",
-      "Bash(uv pip index:*)"
+      "Bash(uv pip index:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(uv add:*)"
     ],
     "deny": [],
     "ask": []
