@@ -21,6 +21,7 @@ todosync-django = { path = "../todosync_django", editable = true }
 [dependency-groups]
 dev = [
     "django-browser-reload>=1.21.0",
+    "pre-commit>=4.0.0",
     "ruff>=0.9.0",
     "taskipy>=1.14.1",
 ]
@@ -29,6 +30,7 @@ dev = [
 runner = "uv run"
 
 [tool.taskipy.tasks]
+pre_commit = {cmd = "pre-commit install", help = "Install pre-commit hooks"}
 lint = {cmd = "ruff check .", help = "Run ruff linter"}
 lint_fix = {cmd = "ruff check . --fix", help = "Run ruff linter with auto-fix"}
 format = {cmd = "ruff format .", help = "Format code with ruff"}
