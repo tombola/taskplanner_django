@@ -21,4 +21,15 @@ todosync-django = { path = "../todosync_django", editable = true }
 [dependency-groups]
 dev = [
     "django-browser-reload>=1.21.0",
+    "taskipy>=1.14.1",
 ]
+
+[tool.taskipy.settings]
+runner = "uv run"
+
+[tool.taskipy.tasks]
+test = {cmd = "pytest -c pytest.ini -v", help = "Run all tests"}
+test_webhook = {cmd = "pytest -c pytest.ini -v ../todosync_django/src/todosync/tests/test_webhook.py", help = "Run webhook tests only"}
+bump_patch = {cmd = "python -c \"import re, pathlib; p=pathlib.Path('pyproject.toml'); t=p.read_text(); t=re.sub(r'version = \\\"(\\d+)\\.(\\d+)\\.(\\d+)\\\"', lambda m: f'version = \\\"{m[1]}.{m[2]}.{int(m[3])+1}\\\"', t); p.write_text(t); print(re.search(r'version = \\\"(.+?)\\\"', t)[1])\"", help = "Bump patch version (0.1.0 -> 0.1.1)"}
+bump_minor = {cmd = "python -c \"import re, pathlib; p=pathlib.Path('pyproject.toml'); t=p.read_text(); t=re.sub(r'version = \\\"(\\d+)\\.(\\d+)\\.(\\d+)\\\"', lambda m: f'version = \\\"{m[1]}.{int(m[2])+1}.0\\\"', t); p.write_text(t); print(re.search(r'version = \\\"(.+?)\\\"', t)[1])\"", help = "Bump minor version (0.1.0 -> 0.2.0)"}
+bump_major = {cmd = "python -c \"import re, pathlib; p=pathlib.Path('pyproject.toml'); t=p.read_text(); t=re.sub(r'version = \\\"(\\d+)\\.(\\d+)\\.(\\d+)\\\"', lambda m: f'version = \\\"{int(m[1])+1}.0.0\\\"', t); p.write_text(t); print(re.search(r'version = \\\"(.+?)\\\"', t)[1])\"", help = "Bump major version (0.1.0 -> 1.0.0)"}
