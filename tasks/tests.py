@@ -2,9 +2,10 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 from wagtail.models import Page, Site
 
-from todosync.models import BaseTaskGroupTemplate, TaskSyncSettings
 from todosync.forms import BaseTaskGroupCreationForm
-from .models import CropTask, BiennialCropTask
+from todosync.models import BaseTaskGroupTemplate, TaskSyncSettings
+
+from .models import BiennialCropTask, CropTask
 
 
 @pytest.fixture

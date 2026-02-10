@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import CropTask, BiennialCropTask
+
+from .models import BiennialCropTask, CropTask
 
 
 @admin.register(CropTask)

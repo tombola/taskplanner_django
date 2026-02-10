@@ -6,8 +6,9 @@ Environment-specific modules (development.py, production.py, etc.)
 import from this file and override as needed.
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
