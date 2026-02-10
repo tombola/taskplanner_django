@@ -1,0 +1,14 @@
+exclude = ["**/__pycache__", ".venv", "static", "static_src", "docs"]
+source_roots = [".", "/Users/tom/projects/experiments/taskplanner/todosync_django/src"]
+
+[[modules]]
+path = "tasks"
+depends_on = ["todosync"]
+
+[[modules]]
+path = "taskplanner"
+depends_on = ["todosync", "tasks"]
+
+[[modules]]
+path = "todosync"
+depends_on = []
