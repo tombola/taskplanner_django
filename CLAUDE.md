@@ -89,7 +89,7 @@ uv run python manage.py createsuperuser
 #   - tokens: Comma-separated list of tokens (e.g., SKU, VARIETYNAME)
 #   - parent_task_title: Optional title template for parent task (uses template title if empty)
 #   - description: Optional description template for parent task (prepended to template description)
-#   - todoist_project_id: Optional Todoist project ID for task organization (uses inbox if empty)
+#   - default_project_id: Optional project ID for task organization (uses inbox if empty)
 ```
 
 ## Architecture Notes
@@ -113,12 +113,12 @@ This project uses the `todosync` Django package for generic task management feat
 
 **Todosync Package (Generic Features):**
 - `BaseTaskGroupTemplate` - Base Wagtail Page model for task templates
-- `TaskSyncSettings` - Site-wide configuration (tokens, Todoist project ID)
+- `TaskSyncSettings` - Site-wide configuration (tokens, default project ID)
 - `LabelActionRule` - Label-based routing rules for webhooks
 - `TaskGroup` - Tracks created task instances
 - `TaskBlock` - StreamField block for task definitions
 - Token substitution utilities
-- Views for task creation with direct Todoist API integration
+- Generic views for task creation; Todoist API integration in `todoist_api.py`
 - Management commands: `list_todoist_projects`, `list_todoist_sections`
 
 **Taskplanner App (Domain-Specific):**
