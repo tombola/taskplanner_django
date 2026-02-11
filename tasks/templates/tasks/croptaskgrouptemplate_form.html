@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block extra_css %}{{ form.media.css }}{% endblock %}
+
+{% block content %}
+
+<h1>{% if object %}Edit {{ object_verbose_name }}{% else %}Create {{ object_verbose_name }}{% endif %}</h1>
+
+<div>
+  <form method="POST" {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}
+    action="{% if object %}{{ update_view_url }}{% else %}{{ create_view_url }}{% endif %}" class="dl-form">
+    {% csrf_token %}
+    {% for field in form %}
+      {% if field.name == "description" or field.name == "tasks" %}
+        {% if token_names %}
+        <p class="token-help">Available tokens: {% for t in token_names %}<code>{{ "{" }}{{ t }}{{ "}" }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+        {% endif %}
+      {% endif %}
+      <div>
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}{{ form.media.js }}{% endblock %}

@@ -4,12 +4,27 @@
 
 {% block content %}
 <h1>Task Templates</h1>
+<section>
+<details>
+<summary>Help</summary>
+<p>A task template is a repeatable group of tasks that can be created all together.</p>
+<p>For example, <a href="{% url 'taskgrouptemplate-create' %}">create a task template</a> for <em>squashes</em>, and define the 'tasks' as 'sow', 'harvest', and 'process'.</p>
+
+<p>When you then click 'create todos' from that template it will present a form for SKU, crop, variety - submitting that form will create todoist tasks for 'sow', 'harvest', and 'process', all grouped under a parent task.</p>
+</details>
+</section>
+
+
+<a href="{% url 'taskgrouptemplate-create' %}">New Template +</a>
 
 {% if templates %}
 <ul class="template-list">
     {% for template in templates %}
     <li>
-        <a href="{% url 'taskgrouptemplate-detail' template.pk %}">{{ template.title }}</a>
+        {{ template.title }} |
+        <a href="{% url 'taskgrouptemplate-update' template.pk %}">edit template</a> |
+        <a href="{% url 'taskgrouptemplate-update' template.pk %}">list created tasks</a> |
+        <a href="{% url 'todosync:create_task_group' %}?template_id={{ template.pk }}">create todos</a> |
         {% if template.description %}
         <p class="template-description">{{ template.description }}</p>
         {% endif %}
