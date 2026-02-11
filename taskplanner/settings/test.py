@@ -7,24 +7,24 @@ Activate by setting:
 
 from .base import *  # noqa: F403, F401
 
-SECRET_KEY = 'django-insecure-test-key-not-for-production'
+SECRET_KEY = "django-insecure-test-key-not-for-production"
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
     }
 }
 
 # Faster password hashing for tests
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.MD5PasswordHasher',
+    "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
-WAGTAILADMIN_BASE_URL = 'http://localhost:8000'
+WAGTAILADMIN_BASE_URL = "http://localhost:8000"
 
-DEBUG_TASK_CREATION = True
+DRY_RUN_TASK_CREATION = True
