@@ -3,6 +3,7 @@
 ## Context
 
 Remove Wagtail CMS dependency entirely from both `todosync_django` (reusable package) and `taskplanner_django` (Django project). Replace with:
+
 - **django-jsonform** — JSON Schema-based form widget for editing nested task data (replaces Wagtail StreamField)
 - **django-polymorphic** — automatic subclass resolution on querysets (replaces Wagtail `.specific`)
 - **django-neapolitan** — CRUD views for TaskGroupTemplate (replaces Wagtail admin pages)
@@ -15,56 +16,56 @@ DB can be deleted; no migration continuity needed.
 
 ### todosync_django/src/todosync/
 
-| File | Action | Summary |
-|------|--------|---------|
-| `models.py` | **Rewrite** | Remove Wagtail/modelcluster imports. BaseTaskGroupTemplate → PolymorphicModel. StreamField → django-jsonform JSONField. TaskSyncSettings → singleton Model. LabelActionRule → regular ForeignKey. |
-| `blocks.py` | **Delete** | No longer needed — task schema defined inline on model |
-| `forms.py` | **Edit** | Remove `.live()`, `.specific` calls |
-| `views.py` | **Edit** | Remove Wagtail Site handling, remove `.specific` |
-| `todoist_api.py` | **Edit** | Remove `site` param. Change StreamField iteration to plain list iteration. |
-| `admin.py` | **Edit** | Add TaskSyncSettings + LabelActionRule inline to Django admin |
-| `urls.py` | No change | |
-| `apps.py` | No change | |
-| `schemas.py` | No change | |
-| `utils.py` | No change | |
-| `management/commands/*.py` | **Edit** | Update help text (remove "Wagtail Admin" references) |
-| `templates/todosync/base.html` | No change | |
-| `templates/todosync/base_task_group_template.html` | **Delete** | Wagtail page template, no longer used |
-| `templates/todosync/create_task_group.html` | **Edit** | Change task iteration from StreamField blocks to plain dicts |
-| `tests/test_todoist_api.py` | **Edit** | Remove Wagtail imports (this is a debug script) |
+| File                                               | Action      | Summary                                                                                                                                                                                           |
+| -------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `models.py`                                        | **Rewrite** | Remove Wagtail/modelcluster imports. BaseTaskGroupTemplate → PolymorphicModel. StreamField → django-jsonform JSONField. TaskSyncSettings → singleton Model. LabelActionRule → regular ForeignKey. |
+| `blocks.py`                                        | **Delete**  | No longer needed — task schema defined inline on model                                                                                                                                            |
+| `forms.py`                                         | **Edit**    | Remove `.live()`, `.specific` calls                                                                                                                                                               |
+| `views.py`                                         | **Edit**    | Remove Wagtail Site handling, remove `.specific`                                                                                                                                                  |
+| `todoist_api.py`                                   | **Edit**    | Remove `site` param. Change StreamField iteration to plain list iteration.                                                                                                                        |
+| `admin.py`                                         | **Edit**    | Add TaskSyncSettings + LabelActionRule inline to Django admin                                                                                                                                     |
+| `urls.py`                                          | No change   |                                                                                                                                                                                                   |
+| `apps.py`                                          | No change   |                                                                                                                                                                                                   |
+| `schemas.py`                                       | No change   |                                                                                                                                                                                                   |
+| `utils.py`                                         | No change   |                                                                                                                                                                                                   |
+| `management/commands/*.py`                         | **Edit**    | Update help text (remove "Wagtail Admin" references)                                                                                                                                              |
+| `templates/todosync/base.html`                     | No change   |                                                                                                                                                                                                   |
+| `templates/todosync/base_task_group_template.html` | **Delete**  | Wagtail page template, no longer used                                                                                                                                                             |
+| `templates/todosync/create_task_group.html`        | **Edit**    | Change task iteration from StreamField blocks to plain dicts                                                                                                                                      |
+| `tests/test_todoist_api.py`                        | **Edit**    | Remove Wagtail imports (this is a debug script)                                                                                                                                                   |
 
 ### taskplanner_django/tasks/
 
-| File | Action | Summary |
-|------|--------|---------|
-| `models.py` | **Edit** | Keep CropTask, BiennialCropTask, CropTaskGroupTemplate. No Wagtail code to remove. |
-| `views.py` | **Rewrite** | Add neapolitan CRUDView for TaskGroupTemplate. Update home view. |
-| `urls.py` | **Rewrite** | Mount neapolitan CRUD URLs at `admin/taskgrouptemplates/` |
-| `admin.py` | **Edit** | Keep CropTask admin. Optionally add polymorphic admin for TaskGroupTemplate. |
-| `wagtail_hooks.py` | **Delete** | Wagtail snippets, no longer used |
+| File               | Action      | Summary                                                                            |
+| ------------------ | ----------- | ---------------------------------------------------------------------------------- |
+| `models.py`        | **Edit**    | Keep CropTask, BiennialCropTask, CropTaskGroupTemplate. No Wagtail code to remove. |
+| `views.py`         | **Rewrite** | Add neapolitan CRUDView for TaskGroupTemplate. Update home view.                   |
+| `urls.py`          | **Rewrite** | Mount neapolitan CRUD URLs at `admin/taskgrouptemplates/`                          |
+| `admin.py`         | **Edit**    | Keep CropTask admin. Optionally add polymorphic admin for TaskGroupTemplate.       |
+| `wagtail_hooks.py` | **Delete**  | Wagtail snippets, no longer used                                                   |
 
 ### taskplanner_django/taskplanner/
 
-| File | Action | Summary |
-|------|--------|---------|
-| `settings/base.py` | **Edit** | Swap INSTALLED_APPS, remove Wagtail middleware/context_processors |
-| `settings/dev.py` | **Edit** | Remove WAGTAILADMIN_BASE_URL |
-| `settings/test.py` | **Edit** | Remove WAGTAILADMIN_BASE_URL |
-| `urls.py` | **Rewrite** | Remove Wagtail URLs, add neapolitan URLs, move Django admin to /admin/ |
+| File               | Action      | Summary                                                                |
+| ------------------ | ----------- | ---------------------------------------------------------------------- |
+| `settings/base.py` | **Edit**    | Swap INSTALLED_APPS, remove Wagtail middleware/context_processors      |
+| `settings/dev.py`  | **Edit**    | Remove WAGTAILADMIN_BASE_URL                                           |
+| `settings/test.py` | **Edit**    | Remove WAGTAILADMIN_BASE_URL                                           |
+| `urls.py`          | **Rewrite** | Remove Wagtail URLs, add neapolitan URLs, move Django admin to /admin/ |
 
 ### taskplanner_django/templates/
 
-| File | Action | Summary |
-|------|--------|---------|
-| `base.html` | **Edit** | Update admin link |
+| File        | Action   | Summary                                |
+| ----------- | -------- | -------------------------------------- |
+| `base.html` | **Edit** | Update admin link                      |
 | `home.html` | **Edit** | Remove Wagtail `.url`, use `{% url %}` |
 
 ### pyproject.toml (both projects)
 
-| File | Action | Summary |
-|------|--------|---------|
-| `todosync_django/pyproject.toml` | **Edit** | Remove wagtail, django-modelcluster. Add django-jsonform, django-polymorphic. |
-| `taskplanner_django/pyproject.toml` | **Edit** | Remove wagtail. Add django-jsonform, django-polymorphic, neapolitan. |
+| File                                | Action   | Summary                                                                       |
+| ----------------------------------- | -------- | ----------------------------------------------------------------------------- |
+| `todosync_django/pyproject.toml`    | **Edit** | Remove wagtail, django-modelcluster. Add django-jsonform, django-polymorphic. |
+| `taskplanner_django/pyproject.toml` | **Edit** | Remove wagtail. Add django-jsonform, django-polymorphic, neapolitan.          |
 
 ---
 
@@ -73,6 +74,7 @@ DB can be deleted; no migration continuity needed.
 ### 1. todosync/models.py
 
 **Remove imports:**
+
 ```python
 # DELETE these
 from wagtail.models import Page
@@ -85,6 +87,7 @@ from .blocks import TaskBlock
 ```
 
 **Add imports:**
+
 ```python
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django_jsonform.models.fields import JSONField
@@ -92,6 +95,7 @@ from polymorphic.models import PolymorphicModel
 ```
 
 **LabelActionRule** — change `ParentalKey` → `ForeignKey`, remove `panels`:
+
 ```python
 class LabelActionRule(models.Model):
     settings = models.ForeignKey(
@@ -103,6 +107,7 @@ class LabelActionRule(models.Model):
 ```
 
 **TaskSyncSettings** — convert to singleton Django model:
+
 ```python
 class TaskSyncSettings(models.Model):
     """Site-wide settings for task sync. Only one instance should exist."""
@@ -131,6 +136,7 @@ class TaskSyncSettings(models.Model):
 ```
 
 **BaseTaskGroupTemplate** — convert from Page to PolymorphicModel:
+
 ```python
 TASKS_SCHEMA = {
     'type': 'array',
@@ -141,7 +147,7 @@ TASKS_SCHEMA = {
         'properties': {
             'title': {
                 'type': 'string',
-                'title': 'Task title (can use tokens like {SKU})',
+                'title': 'Title',
             },
             'labels': {
                 'type': 'string',
@@ -156,7 +162,7 @@ TASKS_SCHEMA = {
                     'properties': {
                         'title': {
                             'type': 'string',
-                            'title': 'Subtask title (can use tokens)',
+                            'title': 'Title',
                         },
                         'labels': {
                             'type': 'string',
@@ -225,6 +231,7 @@ Entire file removed. Task structure defined via `TASKS_SCHEMA` dict in models.py
 ### 5. todosync/todoist_api.py
 
 **`create_tasks_from_template`**: Remove `site` parameter. Change:
+
 ```python
 # Before:
 project_id = template.get_effective_project_id(site)
@@ -234,6 +241,7 @@ project_id = template.get_effective_project_id()
 ```
 
 **Task iteration** — change StreamField format to plain JSON list:
+
 ```python
 # Before:
 for task_data in template.tasks:
@@ -251,6 +259,7 @@ for task_block in (template.tasks or []):
 ### 6. todosync/admin.py
 
 Add TaskSyncSettings + LabelActionRule to Django admin:
+
 ```python
 from .models import TaskSyncSettings, LabelActionRule
 
@@ -360,21 +369,22 @@ MIDDLEWARE = [
 **`home.html`** — change `{{ template.url }}` to `{% url 'taskgrouptemplate-detail' template.pk %}`.
 
 **`todosync/create_task_group.html`** — change StreamField iteration:
+
 ```html
 <!-- Before -->
-{% for block in selected_template.tasks %}
-    {% if block.block_type == 'task' %}
-    <li><strong>{{ block.value.title }}</strong>
-        {% for subtask in block.value.subtasks %}...{% endfor %}
-    </li>
-    {% endif %}
-{% endfor %}
+{% for block in selected_template.tasks %} {% if block.block_type == 'task' %}
+<li>
+  <strong>{{ block.value.title }}</strong>
+  {% for subtask in block.value.subtasks %}...{% endfor %}
+</li>
+{% endif %} {% endfor %}
 
 <!-- After -->
 {% for task in selected_template.tasks %}
-    <li><strong>{{ task.title }}</strong>
-        {% for subtask in task.subtasks %}...{% endfor %}
-    </li>
+<li>
+  <strong>{{ task.title }}</strong>
+  {% for subtask in task.subtasks %}...{% endfor %}
+</li>
 {% endfor %}
 ```
 
