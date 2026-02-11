@@ -44,6 +44,7 @@ bump_major = {cmd = "python -c \"import re, pathlib; p=pathlib.Path('pyproject.t
 [tool.ruff]
 target-version = "py313"
 line-length = 120
+extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
 select = [
