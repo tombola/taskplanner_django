@@ -7,6 +7,7 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "django>=5.2.8",
     "django-click>=2.4.1",
+    "django-extensions>=4.1",
     "django-jsonform>=2.22.0",
     "django-polymorphic>=4.0",
     "neapolitan>=0.1",

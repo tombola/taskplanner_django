@@ -27,7 +27,7 @@ DATABASES = {
     }
 }
 
-INSTALLED_APPS += ["django_browser_reload"]  # noqa: F405
+INSTALLED_APPS += ["django_browser_reload", "django_extensions"]  # noqa: F405
 
 MIDDLEWARE += ["django_browser_reload.middleware.BrowserReloadMiddleware"]  # noqa: F405
 
