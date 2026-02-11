@@ -9,7 +9,7 @@
 <ul class="template-list">
     {% for template in templates %}
     <li>
-        <a href="{{ template.url }}">{{ template.title }}</a>
+        <a href="{% url 'taskgrouptemplate-detail' template.pk %}">{{ template.title }}</a>
         {% if template.description %}
         <p class="template-description">{{ template.description }}</p>
         {% endif %}
