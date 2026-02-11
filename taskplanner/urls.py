@@ -1,37 +1,40 @@
-"""
-URL configuration for taskplanner project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from wagtail import urls as wagtail_urls
-from wagtail.admin import urls as wagtailadmin_urls
-from wagtail.documents import urls as wagtaildocs_urls
+from neapolitan.views import Role
 
-from tasks.views import home
+from tasks.views import TaskGroupTemplateCRUDView, home
 
 urlpatterns = [
-    path('django-admin/', admin.site.urls),
-    path('admin/', include(wagtailadmin_urls)),
-    path('documents/', include(wagtaildocs_urls)),
-    path('tasks/', include('tasks.urls')),
-    path('', home, name='home'),
-    path('pages/', include(wagtail_urls)),
+    # Neapolitan CRUD views (before Django admin catch-all)
+    path("admin/taskgrouptemplates/", TaskGroupTemplateCRUDView.as_view(role=Role.LIST), name="taskgrouptemplate-list"),
+    path(
+        "admin/taskgrouptemplates/new/",
+        TaskGroupTemplateCRUDView.as_view(role=Role.CREATE),
+        name="taskgrouptemplate-create",
+    ),
+    path(
+        "admin/taskgrouptemplates/<int:pk>/",
+        TaskGroupTemplateCRUDView.as_view(role=Role.DETAIL),
+        name="taskgrouptemplate-detail",
+    ),
+    path(
+        "admin/taskgrouptemplates/<int:pk>/edit/",
+        TaskGroupTemplateCRUDView.as_view(role=Role.UPDATE),
+        name="taskgrouptemplate-update",
+    ),
+    path(
+        "admin/taskgrouptemplates/<int:pk>/delete/",
+        TaskGroupTemplateCRUDView.as_view(role=Role.DELETE),
+        name="taskgrouptemplate-delete",
+    ),
+    # Django admin
+    path("admin/", admin.site.urls),
+    # Todosync (webhook + create form)
     path("todosync/", include("todosync.urls")),
+    # Home
+    path("", home, name="home"),
 ]
 
 if settings.DEBUG:
