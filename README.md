@@ -19,6 +19,17 @@ cp .env.example .env           # Configure environment variables
 uv run python manage.py migrate  # Apply database migrations
 ```
 
+### Authentication
+
+This project uses [django-allauth](https://docs.allauth.org/) for authentication with Google OAuth.
+
+Add the following to your `.env` file:
+
+```
+GOOGLE_AUTH_CLIENT_ID=your-client-id
+GOOGLE_AUTH_CLIENT_SECRET=your-client-secret
+```
+
 ### Pre-commit hooks
 
 This project uses [pre-commit](https://pre-commit.com/) to run ruff linting and formatting before each commit.

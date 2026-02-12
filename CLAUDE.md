@@ -102,6 +102,14 @@ uv run python manage.py createsuperuser
 - Admin interface configured in `admin.py` files for each app
 - Tests use pytest with pytest-django plugin
 
+### Authentication
+
+Authentication is handled by `django-allauth` with Google OAuth:
+
+- Allauth URLs mounted at `/accounts/`
+- Google OAuth credentials configured via `GOOGLE_AUTH_CLIENT_ID` and `GOOGLE_AUTH_CLIENT_SECRET` env vars
+- Provider settings in `SOCIALACCOUNT_PROVIDERS` in `base.py`
+
 ### TodoSync Package Integration
 
 This project uses the `todosync` Django package for generic task management features:

@@ -33,6 +33,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # Todosync (webhook + create form)
     path("todosync/", include("todosync.urls")),
+    # Allauth
+    path("accounts/", include("allauth.urls")),
     # Home
     path("", home, name="home"),
     path("templates/", template_list, name="template-list"),

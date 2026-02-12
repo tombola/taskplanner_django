@@ -32,6 +32,11 @@ INSTALLED_APPS = [
     "django_jsonform",
     "polymorphic",
     "neapolitan",
+    # Allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     # Todosync package
     "todosync",
     # Local apps
@@ -46,9 +51,15 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "taskplanner.urls"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 
 # URL prefix for reverse proxy deployment
 # Set to None for local development, '/tasks' for production
@@ -164,3 +175,14 @@ LOGGING = {
 TODOIST_API_TOKEN = os.getenv("TODOIST_API_TOKEN", "")
 TODOIST_CLIENT_ID = os.getenv("TODOIST_CLIENT_ID", "")
 TODOIST_CLIENT_SECRET = os.getenv("TODOIST_CLIENT_SECRET", "")
+
+# Django Allauth / Google OAuth
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.getenv("GOOGLE_AUTH_CLIENT_ID", ""),
+            "secret": os.getenv("GOOGLE_AUTH_CLIENT_SECRET", ""),
+            "key": "",
+        },
+    },
+}
