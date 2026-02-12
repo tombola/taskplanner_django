@@ -375,6 +375,39 @@ details {
     margin-bottom: 1.2rem
 }
 
+/* Task group list (tasks from a template) */
+.task-group-list {
+    list-style: none;
+    padding: 0;
+}
+
+.task-group-item {
+    background: white;
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.task-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.task-meta {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.task-group-item .subtask-list {
+    margin-top: 0.75rem;
+}
+
+.task-group-item .subtask-item.completed {
+    color: #888;
+}
+
 /* Create task group: two-column layout */
 .create-task-layout {
     display: grid;

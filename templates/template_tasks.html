@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ template.title }} - Tasks{% endblock %}
+
+{% block content %}
+<h1>{{ template.title }}</h1>
+<p>
+    <a href="{% url 'template-list' %}">&larr; All templates</a> |
+    <a href="{% url 'todosync:create_task_group' %}?template_id={{ template.pk }}">Create todos</a>
+</p>
+
+{% if parent_tasks %}
+<ul class="task-group-list">
+    {% for parent_task in parent_tasks %}
+    <li class="task-group-item">
+        <div class="task-group-header">
+            <strong><a href="https://app.todoist.com/app/task/{{ parent_task.todo_id }}">{{ parent_task.get_parent_task_title }}</a></strong>
+            <span class="task-meta">{{ parent_task.created_at|date:"d M Y" }}</span>
+        </div>
+        {% if parent_task.subtasks.all %}
+        <ul class="subtask-list">
+            {% for subtask in parent_task.subtasks.all %}
+            <li class="subtask-item {% if subtask.completed %}completed{% endif %}">
+                {% if subtask.completed %}<s>{{ subtask.title }}</s>{% else %}{{ subtask.title }}{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No tasks have been created from this template yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,10 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from neapolitan.views import CRUDView
 
-from todosync.models import BaseTaskGroupTemplate, Task
+from todosync.models import BaseParentTask, BaseTaskGroupTemplate, Task
 
 from .models import CropTaskGroupTemplate
 
@@ -61,3 +61,16 @@ def home(request):
 def template_list(request):
     templates = BaseTaskGroupTemplate.objects.all()
     return render(request, "template_list.html", {"templates": templates})
+
+
+def template_tasks(request, pk):
+    template = get_object_or_404(BaseTaskGroupTemplate, pk=pk)
+    parent_task_model = template.get_parent_task_model() or BaseParentTask
+    parent_tasks = (
+        parent_task_model.objects.filter(template=template).select_related("template").prefetch_related("subtasks")
+    )
+    return render(
+        request,
+        "template_tasks.html",
+        {"template": template, "parent_tasks": parent_tasks},
+    )

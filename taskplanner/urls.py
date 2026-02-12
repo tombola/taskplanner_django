@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import include, path
 from neapolitan.views import Role
 
-from tasks.views import TaskGroupTemplateCRUDView, home, template_list
+from tasks.views import TaskGroupTemplateCRUDView, home, template_list, template_tasks
 
 urlpatterns = [
     # Neapolitan CRUD views (before Django admin catch-all)
@@ -36,6 +36,7 @@ urlpatterns = [
     # Home
     path("", home, name="home"),
     path("templates/", template_list, name="template-list"),
+    path("templates/<int:pk>/tasks/", template_tasks, name="template-tasks"),
 ]
 
 if settings.DEBUG:
