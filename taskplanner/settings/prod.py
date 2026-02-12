@@ -29,3 +29,15 @@ DATABASES = {
 WAGTAILADMIN_BASE_URL = os.getenv("WAGTAILADMIN_BASE_URL", "https://tasks.allotmentplotter.uk")
 
 DRY_RUN_TASK_CREATION = False
+
+# Django Allauth / Google OAuth
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.getenv("GOOGLE_AUTH_CLIENT_ID", ""),
+            "secret": os.getenv("GOOGLE_AUTH_CLIENT_SECRET", ""),
+            "key": "",
+        },
+    },
+}
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
