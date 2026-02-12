@@ -23,7 +23,7 @@ class CropTask(BaseParentTask):
         return ["crop", "sku", "variety_name", "bed"]
 
     def get_parent_task_title(self):
-        return f"Plant {self.variety_name}"
+        return f"{self.sku} - {self.variety_name}"
 
     def get_description(self):
         return f"Crop: {self.crop}\nVariety: {self.variety_name}\nSKU: {self.sku}\nBed: {self.bed}"
@@ -49,5 +49,5 @@ class CropTaskGroupTemplate(BaseTaskGroupTemplate):
     parent_task_class = CropTask
 
     class Meta:
-        verbose_name = "Crop Task Group Template"
-        verbose_name_plural = "Crop Task Group Templates"
+        verbose_name = "Crop Template"
+        verbose_name_plural = "Crop Templates"
