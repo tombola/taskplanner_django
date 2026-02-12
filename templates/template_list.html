@@ -22,7 +22,7 @@
     <li>
         {{ template.title }} |
         <a href="{% url 'taskgrouptemplate-update' template.pk %}">edit template</a> |
-        <a href="#">list</a> |
+        <a href="{% url 'template-tasks' template.pk %}">list</a> |
         <a href="{% url 'todosync:create_task_group' %}?template_id={{ template.pk }}">create todos</a>
         {% if template.description %}
         <p class="template-description">{{ template.description }}</p>
