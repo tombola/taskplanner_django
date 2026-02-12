@@ -1,22 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %}Task Planner - Home{% endblock %}
+{% block title %}Task Planner - Dashboard{% endblock %}
 
 {% block content %}
-<h1>Task Templates</h1>
+<div class="dashboard">
 
-{% if templates %}
-<ul class="template-list">
-    {% for template in templates %}
-    <li>
-        <a href="{{ template.url }}">{{ template.title }}</a>
-        {% if template.description %}
-        <p class="template-description">{{ template.description }}</p>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No task templates available yet.</p>
-{% endif %}
+  <h1>Dashboard</h1>
+
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <span class="stat-value">{{ total_tasks }}</span>
+      <span class="stat-label">Total tasks</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ due_this_month_count }}</span>
+      <span class="stat-label">Due in {{ current_month }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ due_this_month_completed }} / {{ due_this_month_count }}</span>
+      <span class="stat-label">Completed this month</span>
+    </div>
+    <div class="stat-card">
+      {% if completion_pct != None %}
+        <span class="stat-value">{{ completion_pct }}%</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: {{ completion_pct }}%"></div></div>
+      {% else %}
+        <span class="stat-value">&mdash;</span>
+      {% endif %}
+      <span class="stat-label">Completion rate</span>
+    </div>
+  </div>
+
+  <div class="dashboard-section">
+    <h2>Create tasks</h2>
+    {% if templates %}
+    <ul class="create-links">
+      {% for template in templates %}
+      <li>
+        <a class="button" href="{% url 'todosync:create_task_group' %}?template_id={{ template.pk }}">{{ template.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No templates yet. <a href="{% url 'taskgrouptemplate-create' %}">Create one</a> to get started.</p>
+    {% endif %}
+  </div>
+
+  <div class="dashboard-section">
+    <a href="{% url 'template-list' %}">Manage templates</a>
+  </div>
+
+</div>
 {% endblock %}

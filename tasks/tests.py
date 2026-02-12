@@ -1,83 +1,42 @@
 import pytest
-from django.contrib.contenttypes.models import ContentType
-from wagtail.models import Page, Site
 
 from todosync.forms import BaseTaskGroupCreationForm
 from todosync.models import BaseTaskGroupTemplate, TaskSyncSettings
 
-from .models import BiennialCropTask, CropTask
+from .models import BiennialCropTask, CropTask, CropTaskGroupTemplate
 
 
 @pytest.fixture
-def wagtail_site(db):
-    """Get or create a Wagtail site with root page"""
-    root_page = Page.objects.get(id=1)
-    site, created = Site.objects.get_or_create(
-        hostname="localhost", defaults={"root_page": root_page, "is_default_site": True}
-    )
-    return site
+def sync_settings(db):
+    """Create TaskSyncSettings singleton for testing"""
+    return TaskSyncSettings.load()
 
 
 @pytest.fixture
-def sync_settings(db, wagtail_site):
-    """Create TaskSyncSettings for testing"""
-    settings, _ = TaskSyncSettings.objects.get_or_create(site=wagtail_site, defaults={"default_project_id": ""})
-    return settings
-
-
-@pytest.fixture
-def crop_task_ct(db):
-    """Get ContentType for CropTask"""
-    return ContentType.objects.get_for_model(CropTask)
-
-
-@pytest.fixture
-def biennial_ct(db):
-    """Get ContentType for BiennialCropTask"""
-    return ContentType.objects.get_for_model(BiennialCropTask)
-
-
-@pytest.fixture
-def task_group_template(db, wagtail_site, sync_settings, crop_task_ct):
-    """Create a BaseTaskGroupTemplate with task_type=CropTask for testing"""
-    root_page = Page.objects.get(id=1)
-
-    template = BaseTaskGroupTemplate(
+def task_group_template(db, sync_settings):
+    """Create a CropTaskGroupTemplate for testing"""
+    return CropTaskGroupTemplate.objects.create(
         title="Test Chilli Template",
-        slug="test-chilli",
         description="",
-        task_type=crop_task_ct,
         tasks=[
-            {"type": "task", "value": {"title": "Sow {sku}", "labels": "sow, planting", "subtasks": []}},
+            {"title": "Sow {sku}", "labels": "sow, planting", "subtasks": []},
             {
-                "type": "task",
-                "value": {
-                    "title": "Harvest {variety_name}",
-                    "labels": "harvest",
-                    "subtasks": [{"title": "{sku} checked in", "labels": "processing"}],
-                },
+                "title": "Harvest {variety_name}",
+                "labels": "harvest",
+                "subtasks": [{"title": "{sku} checked in", "labels": "processing"}],
             },
         ],
-        live=True,
     )
-
-    root_page.add_child(instance=template)
-    template.save_revision().publish()
-
-    return template
 
 
 @pytest.fixture
-def empty_template(db, wagtail_site, sync_settings):
-    """Create a BaseTaskGroupTemplate with no task_type"""
-    root_page = Page.objects.get(id=1)
-
-    template = BaseTaskGroupTemplate(title="Empty Template", slug="empty-template", description="", tasks=[], live=True)
-
-    root_page.add_child(instance=template)
-    template.save_revision().publish()
-
-    return template
+def empty_template(db, sync_settings):
+    """Create a BaseTaskGroupTemplate with no parent_task_class"""
+    return BaseTaskGroupTemplate.objects.create(
+        title="Empty Template",
+        description="",
+        tasks=[],
+    )
 
 
 @pytest.mark.django_db
@@ -85,11 +44,12 @@ class TestCropTaskModel:
     """Tests for CropTask model"""
 
     def test_get_token_field_names(self):
-        assert CropTask.get_token_field_names() == ["sku", "variety_name", "bed"]
+        assert CropTask.get_token_field_names() == ["crop", "sku", "variety_name", "bed"]
 
     def test_get_token_values(self):
-        task = CropTask(sku="CH001", variety_name="Habanero", bed="A1")
+        task = CropTask(crop="Chilli", sku="CH001", variety_name="Habanero", bed="A1")
         assert task.get_token_values() == {
+            "crop": "Chilli",
             "sku": "CH001",
             "variety_name": "Habanero",
             "bed": "A1",
@@ -100,8 +60,8 @@ class TestCropTaskModel:
         assert task.get_parent_task_title() == "Plant Habanero"
 
     def test_get_description(self):
-        task = CropTask(sku="CH001", bed="A1")
-        assert task.get_description() == "SKU: CH001, Bed: A1"
+        task = CropTask(crop="Chilli", sku="CH001", variety_name="Habanero", bed="A1")
+        assert task.get_description() == "Crop: Chilli\nVariety: Habanero\nSKU: CH001\nBed: A1"
 
 
 @pytest.mark.django_db
@@ -132,24 +92,24 @@ class TestBaseTaskGroupTemplate:
         assert empty_template.get_parent_task_model() is None
 
     def test_get_token_field_names(self, task_group_template):
-        assert task_group_template.get_token_field_names() == ["sku", "variety_name", "bed"]
+        assert task_group_template.get_token_field_names() == ["crop", "sku", "variety_name", "bed"]
 
-    def test_get_token_field_names_no_task_type(self, empty_template):
+    def test_get_token_field_names_no_parent_task_class(self, empty_template):
         assert empty_template.get_token_field_names() == []
 
-    def test_get_effective_project_id_from_template(self, task_group_template, wagtail_site):
+    def test_get_effective_project_id_from_template(self, task_group_template):
         task_group_template.project_id = "12345"
-        assert task_group_template.get_effective_project_id(wagtail_site) == "12345"
+        assert task_group_template.get_effective_project_id() == "12345"
 
-    def test_get_effective_project_id_fallback_to_settings(self, task_group_template, wagtail_site, sync_settings):
+    def test_get_effective_project_id_fallback_to_settings(self, task_group_template, sync_settings):
         task_group_template.project_id = ""
         sync_settings.default_project_id = "99999"
         sync_settings.save()
-        assert task_group_template.get_effective_project_id(wagtail_site) == "99999"
+        assert task_group_template.get_effective_project_id() == "99999"
 
-    def test_get_effective_project_id_empty(self, task_group_template, wagtail_site):
+    def test_get_effective_project_id_empty(self, task_group_template):
         task_group_template.project_id = ""
-        assert task_group_template.get_effective_project_id(wagtail_site) == ""
+        assert task_group_template.get_effective_project_id() == ""
 
 
 @pytest.mark.django_db
@@ -166,20 +126,23 @@ class TestTaskGroupCreationForm:
         form = BaseTaskGroupCreationForm(template_id=task_group_template.id)
         assert "task_group_template" in form.fields
         assert "description" in form.fields
+        assert "token_crop" in form.fields
         assert "token_sku" in form.fields
         assert "token_variety_name" in form.fields
         assert "token_bed" in form.fields
-        assert len(form.fields) == 5
+        assert len(form.fields) == 6
 
     def test_dynamic_field_labels(self, task_group_template):
         form = BaseTaskGroupCreationForm(template_id=task_group_template.id)
+        assert form.fields["token_crop"].label == "Crop"
         assert form.fields["token_sku"].label == "Sku"
         assert form.fields["token_variety_name"].label == "Variety Name"
         assert form.fields["token_bed"].label == "Bed"
 
     def test_dynamic_field_required(self, task_group_template):
-        """sku and variety_name are required (blank=False), bed is optional (blank=True)"""
+        """sku and variety_name are required (blank=False), crop and bed are optional (blank=True)"""
         form = BaseTaskGroupCreationForm(template_id=task_group_template.id)
+        assert form.fields["token_crop"].required is False
         assert form.fields["token_sku"].required is True
         assert form.fields["token_variety_name"].required is True
         assert form.fields["token_bed"].required is False
@@ -188,7 +151,7 @@ class TestTaskGroupCreationForm:
         form = BaseTaskGroupCreationForm(template_id=99999)
         assert len(form.fields) == 2
 
-    def test_form_with_no_task_type(self, empty_template):
+    def test_form_with_no_parent_task_class(self, empty_template):
         form = BaseTaskGroupCreationForm(template_id=empty_template.id)
         assert len(form.fields) == 2
 
@@ -196,6 +159,7 @@ class TestTaskGroupCreationForm:
         form = BaseTaskGroupCreationForm(
             data={
                 "task_group_template": task_group_template.id,
+                "token_crop": "Chilli",
                 "token_sku": "CH001",
                 "token_variety_name": "Habanero",
                 "token_bed": "A1",
@@ -232,6 +196,7 @@ class TestTaskGroupCreationForm:
         form = BaseTaskGroupCreationForm(
             data={
                 "task_group_template": task_group_template.id,
+                "token_crop": "Chilli",
                 "token_sku": "CH001",
                 "token_variety_name": "Habanero",
                 "token_bed": "A1",
@@ -240,6 +205,7 @@ class TestTaskGroupCreationForm:
         )
         assert form.is_valid()
         assert form.get_token_values() == {
+            "crop": "Chilli",
             "sku": "CH001",
             "variety_name": "Habanero",
             "bed": "A1",
@@ -249,14 +215,10 @@ class TestTaskGroupCreationForm:
         form = BaseTaskGroupCreationForm()
         assert form.get_token_values() == {}
 
-    def test_queryset_only_live_templates(self, task_group_template):
+    def test_queryset_includes_all_templates(self, task_group_template):
         form = BaseTaskGroupCreationForm()
         queryset = form.fields["task_group_template"].queryset
         assert task_group_template in queryset
-
-        task_group_template.unpublish()
-        form2 = BaseTaskGroupCreationForm()
-        assert task_group_template not in form2.fields["task_group_template"].queryset
 
     def test_template_field_populated_with_template_id(self, task_group_template):
         form = BaseTaskGroupCreationForm(template_id=task_group_template.id)
