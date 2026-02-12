@@ -374,3 +374,22 @@ textarea {
 details {
     margin-bottom: 1.2rem
 }
+
+/* Create task group: two-column layout */
+.create-task-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .create-task-layout {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+
+    .create-task-layout .task-preview {
+        position: sticky;
+        top: 1rem;
+    }
+}
