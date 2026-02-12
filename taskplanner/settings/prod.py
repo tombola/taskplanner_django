@@ -14,7 +14,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 
 DEBUG = False
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "tasks.allotmentplotter.uk").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "tasks.allotmentplotter.uk,localhost").split(",")
 
 CSRF_TRUSTED_ORIGINS = [
     "https://tasks.allotmentplotter.uk",
