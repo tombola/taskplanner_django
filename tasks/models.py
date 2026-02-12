@@ -29,16 +29,6 @@ class CropTask(BaseParentTask):
         return f"Crop: {self.crop}\nVariety: {self.variety_name}\nSKU: {self.sku}\nBed: {self.bed}"
 
 
-class CropTaskGroupTemplate(BaseTaskGroupTemplate):
-    """Task group template for crop-related tasks."""
-
-    parent_task_class = CropTask
-
-    class Meta:
-        verbose_name = "Crop Task Group Template"
-        verbose_name_plural = "Crop Task Group Templates"
-
-
 class BiennialCropTask(CropTask):
     """Parent task for biennial crop task groups."""
 
@@ -51,3 +41,13 @@ class BiennialCropTask(CropTask):
     @classmethod
     def get_token_field_names(cls):
         return ["sku", "variety_name", "bed", "bed_second_year"]
+
+
+class CropTaskGroupTemplate(BaseTaskGroupTemplate):
+    """Task group template for crop-related tasks."""
+
+    parent_task_class = CropTask
+
+    class Meta:
+        verbose_name = "Crop Task Group Template"
+        verbose_name_plural = "Crop Task Group Templates"

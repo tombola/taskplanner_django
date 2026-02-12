@@ -12,7 +12,8 @@
     <header>
         <nav>
             {% block navigation %}
-            <a href="/">Home</a>
+            <a href="{% url 'home' %}">Dashboard</a>
+            <a href="{% url 'template-list' %}">Templates</a>
             <a href="/admin/">Admin</a>
             {% endblock %}
         </nav>
